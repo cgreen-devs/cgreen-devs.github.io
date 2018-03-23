@@ -5,7 +5,7 @@
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.4">
-<meta name="author" content="Marcus Baker, Thomas Nilsson, João Freitas">
+<meta name="author" content="Marcus Baker, Thomas Nilefalk, João Freitas">
 <title>Cgreen : Unit Tests, Stubbing and Mocking for C and C++</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -425,11 +425,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="details">
 <span id="author" class="author">Marcus Baker</span><br>
 <span id="email" class="email"><a href="mailto:marcus@lastcraft.com">marcus@lastcraft.com</a></span><br>
-<span id="author2" class="author">Thomas Nilsson</span><br>
+<span id="author2" class="author">Thomas Nilefalk</span><br>
 <span id="email2" class="email"><a href="mailto:thomas@junovagen.se">thomas@junovagen.se</a></span><br>
 <span id="author3" class="author">João Freitas</span><br>
 <span id="email3" class="email"><a href="mailto:joaohf@gmail.com">joaohf@gmail.com</a></span><br>
-<span id="revnumber">version 1.0.0beta6</span>
+<span id="revnumber">version 1.1.0beta</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -441,7 +441,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_installing_cgreen">1.3. Installing Cgreen</a></li>
 <li><a href="#tdd_with_cgreen">1.4. Five Minutes Doing TDD with Cgreen</a></li>
 <li><a href="#_what_are_mock_functions">1.5. What are Mock Functions?</a></li>
-<li><a href="#_using_cgreen_with_c">1.6. Using Cgreen with C++</a></li>
 </ul>
 </li>
 <li><a href="#_building_cgreen_test_suites">2. Building Cgreen test suites</a>
@@ -454,48 +453,59 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_a_runner">2.6. A Runner</a></li>
 <li><a href="#_beforeeach_and_aftereach">2.7. BeforeEach and AfterEach</a></li>
 <li><a href="#_each_test_in_its_own_process">2.8. Each Test in its Own Process</a></li>
-<li><a href="#_building_composite_test_suites">2.9. Building Composite Test Suites</a></li>
+<li><a href="#no-fork">2.9. No fork, please</a></li>
+<li><a href="#_building_composite_test_suites">2.10. Building Composite Test Suites</a></li>
 </ul>
 </li>
-<li><a href="#runner">3. Automatic Test Discovery</a>
+<li><a href="#_mocking_functions_with_cgreen">3. Mocking functions with Cgreen</a>
 <ul class="sectlevel2">
-<li><a href="#_forgot_to_add_your_test">3.1. Forgot to Add Your Test?</a></li>
-<li><a href="#_the_solution_the_cgreen_runner">3.2. The Solution - the 'cgreen-runner'</a></li>
-<li><a href="#_using_the_runner">3.3. Using the Runner</a></li>
-<li><a href="#runner-options">3.4. Cgreen Runner Options</a></li>
-<li><a href="#_selecting_tests_to_run">3.5. Selecting Tests To Run</a></li>
-<li><a href="#_multiple_test_libraries">3.6. Multiple Test Libraries</a></li>
-<li><a href="#_setup_teardown_and_custom_reporters">3.7. Setup, Teardown and Custom Reporters</a></li>
+<li><a href="#_the_problem_with_streams">3.1. The Problem with Streams</a></li>
+<li><a href="#_record_and_playback">3.2. Record and Playback</a></li>
+<li><a href="#_setting_expectations_on_mock_functions">3.3. Setting Expectations on Mock Functions</a></li>
+<li><a href="#_mocks_are">3.4. Mocks Are&#8230;&#8203;</a></li>
 </ul>
 </li>
-<li><a href="#_mocking_functions_with_cgreen">4. Mocking functions with Cgreen</a>
+<li><a href="#_special_cases">4. Special Cases</a>
 <ul class="sectlevel2">
-<li><a href="#_the_problem_with_streams">4.1. The Problem with Streams</a></li>
-<li><a href="#_record_and_playback">4.2. Record and Playback</a></li>
-<li><a href="#_setting_expectations_on_mock_functions">4.3. Setting Expectations on Mock Functions</a></li>
-<li><a href="#_mocks_are">4.4. Mocks Are&#8230;&#8203;</a></li>
+<li><a href="#_working_with_code_doubles_code">4.1. Working with <code>doubles</code></a></li>
+<li><a href="#_using_cgreen_with_c">4.2. Using Cgreen with C++</a></li>
 </ul>
 </li>
-<li><a href="#_context_subject_under_test_suites">5. Context, Subject Under Test &amp; Suites</a>
+<li><a href="#_context_system_under_test_suites">5. Context, System Under Test &amp; Suites</a>
 <ul class="sectlevel2">
-<li><a href="#_the_sut_subject_under_test">5.1. The SUT - Subject Under Test</a></li>
+<li><a href="#_the_sut_system_under_test">5.1. The SUT - System Under Test</a></li>
 <li><a href="#_contexts_and_before_and_after">5.2. Contexts and Before and After</a></li>
 </ul>
 </li>
-<li><a href="#changing_style">6. Changing Style</a></li>
-<li><a href="#reporter">7. Changing Cgreen Reporting</a>
+<li><a href="#runner">6. Automatic Test Discovery</a>
 <ul class="sectlevel2">
-<li><a href="#_replacing_the_reporter">7.1. Replacing the Reporter</a></li>
-<li><a href="#_the_testreporter_structure">7.2. The TestReporter Structure</a></li>
-<li><a href="#_an_example_xml_reporter">7.3. An Example XML Reporter</a></li>
+<li><a href="#_forgot_to_add_your_test">6.1. Forgot to Add Your Test?</a></li>
+<li><a href="#_the_solution_the_cgreen_runner">6.2. The Solution - the 'cgreen-runner'</a></li>
+<li><a href="#_using_the_runner">6.3. Using the Runner</a></li>
+<li><a href="#runner-options">6.4. Cgreen Runner Options</a></li>
+<li><a href="#_selecting_tests_to_run">6.5. Selecting Tests To Run</a></li>
+<li><a href="#_multiple_test_libraries">6.6. Multiple Test Libraries</a></li>
+<li><a href="#_setup_teardown_and_custom_reporters">6.7. Setup, Teardown and Custom Reporters</a></li>
+<li><a href="#xensure">6.8. Skipping Tests</a></li>
 </ul>
 </li>
-<li><a href="#_hints_and_tips">8. Hints and Tips</a>
+<li><a href="#changing_style">7. Changing Style</a></li>
+<li><a href="#reporter">8. Changing Cgreen Reporting</a>
 <ul class="sectlevel2">
-<li><a href="#_compiler_error_messages">8.1. Compiler Error Messages</a></li>
-<li><a href="#_signed_unsigned_hex_and_byte">8.2. Signed, Unsigned, Hex and Byte</a></li>
-<li><a href="#_cgreen_and_coverage">8.3. Cgreen and Coverage</a></li>
-<li><a href="#_garbled_output">8.4. Garbled Output</a></li>
+<li><a href="#_replacing_the_reporter">8.1. Replacing the Reporter</a></li>
+<li><a href="#builtin_reporters">8.2. Built-in Reporters</a></li>
+<li><a href="#_rolling_our_own">8.3. Rolling Our Own</a></li>
+<li><a href="#_the_testreporter_structure">8.4. The TestReporter Structure</a></li>
+<li><a href="#_an_example_xml_reporter">8.5. An Example XML Reporter</a></li>
+</ul>
+</li>
+<li><a href="#_hints_and_tips">9. Hints and Tips</a>
+<ul class="sectlevel2">
+<li><a href="#cgreen-mocker">9.1. <code>cgreen-mocker</code> - Automated Mocking</a></li>
+<li><a href="#_compiler_error_messages">9.2. Compiler Error Messages</a></li>
+<li><a href="#_signed_unsigned_hex_and_byte">9.3. Signed, Unsigned, Hex and Byte</a></li>
+<li><a href="#_cgreen_and_coverage">9.4. Cgreen and Coverage</a></li>
+<li><a href="#_garbled_output">9.5. Garbled Output</a></li>
 </ul>
 </li>
 <li><a href="#_license">Appendix A: License</a></li>
@@ -512,7 +522,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p><strong>Cgreen</strong> is a unit tester for the C and C++ software developer, a test
 automation and software quality assurance tool for programmers and
 development teams. The tool is completely open source published under
-the <a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>.</p>
+the <a href="https://github.com/cgreen-devs/cgreen/blob/master/LICENSE">ISC,
+OpenBSD, license</a>.</p>
 </div>
 <div class="paragraph">
 <p>Unit testing is a development practice popularised by the agile
@@ -520,7 +531,7 @@ development community.  It is characterised by writing many small
 tests alongside the normal code. Often the tests are written before
 the code they are testing, in a tight test-code-refactor loop.  Done
 this way, the practice is known as Test Driven Development. <strong>Cgreen</strong>
-was designed to support this style of development.</p>
+was designed specifically to support this style of development.</p>
 </div>
 <div class="paragraph">
 <p>Unit tests are written in the same language as the code, in our case
@@ -560,7 +571,7 @@ and also allows you to use any application code in your tests.</p>
 <p>Fully composable test suites</p>
 </li>
 <li>
-<p>An isolated test can be run in a single process for debugging</p>
+<p>A single test can be run in a single process for easier debugging</p>
 </li>
 </ul>
 </div>
@@ -570,8 +581,10 @@ porting from other frameworks.</p>
 </div>
 <div class="paragraph">
 <p><strong>Cgreen</strong> was initially developed to support C programming, but there
-is also excellent support for C++. It was initially a spinoff from a
-research project at Wordtracker and created by Marcus Baker.</p>
+is also some support for C++. It was initially a spinoff from a
+research project at Wordtracker and created by Marcus Baker. Significant
+additions by Matt Hargett and continuous nurturing by Thomas Nilefalk has
+made <strong>Cgreen</strong> what it is today.</p>
 </div>
 </div>
 <div class="sect2">
@@ -615,8 +628,8 @@ API.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-At this point there are no supported pre-built packages
-available. For now you&#8217;ll have to build from source.
+At this point there are few supported pre-built packages
+available. For now you&#8217;ll probably have to build from source.
 </td>
 </tr>
 </table>
@@ -702,7 +715,7 @@ installed in the system, by default in the <code>/usr/local/lib/</code>.</p>
 <div class="sect3">
 <h4 id="_your_first_test">1.3.3. Your First Test</h4>
 <div class="paragraph">
-<p>We will start demonstration the use of <strong>CGreen</strong> by writing some tests
+<p>We will start demonstrating the use of <strong>Cgreen</strong> by writing some tests for <strong>Cgreen</strong> itself
 to confirm that everything is working as it should. Let&#8217;s start with a
 simple test module with no tests, called <code>first_test.c</code>&#8230;&#8203;</p>
 </div>
@@ -728,10 +741,10 @@ header file and the mysterious looking "declarations" at the beginning
 of the file.</p>
 </div>
 <div class="paragraph">
-<p>The BDD flavoured <strong>Cgreen</strong> notation calls for a Subject Under Test
+<p>The BDD flavoured <strong>Cgreen</strong> notation calls for a System Under Test
 (SUT), or a 'context'. The declarations give a context to the tests
 and it also makes it more natural to talk about which module or class,
-the subject under test, is actually responsible for the functionality
+the system under test, is actually responsible for the functionality
 we are expressing. In one way we are 'describing', or spec&#8217;ing, the
 functionality of the SUT. That&#8217;s what the <code>Describe();</code> does. And for
 technical reasons (actually requirements of the C language), you must
@@ -746,7 +759,7 @@ are empty. (You will get strange errors if you don&#8217;t!)</p>
 </td>
 <td class="content">
 We are using the name "Cgreen" as the SUT in these first
-examples, as if <strong>Cgreen</strong> itself was the object or class we wanted to
+examples, as <strong>Cgreen</strong> itself is the object or class we want to
 test or describe.
 </td>
 </tr>
@@ -773,7 +786,7 @@ $ ./first_test</pre>
 <div class="listingblock">
 <div class="content">
 <pre>Running "main" (0 tests)...
-Completed "main": 0 passes, 0 failures, 0 exceptions in 0ms.</pre>
+Completed "main":  in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -827,7 +840,7 @@ context (<code>Cgreen</code>) and a, hopefully descriptive, testname
 first_tests.c:12: Failure: fails_this_test
 	Expected [0 == 1] to [be true]
 
-Completed "main": 1 pass, 1 failure, 0 exceptions in 1ms.</pre>
+Completed "main": 1 pass, 1 failure in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -920,16 +933,6 @@ that one test cannot leave any state to the next, thus forcing you to
 setup the prerequisites for each test correctly and clearly.</p>
 </div>
 <div class="paragraph">
-<p>But if you want to debug any of your tests the constant <code>fork()</code>-ing
-can make that difficult or impossible. To make debugging simpler,
-<strong>Cgreen</strong> does not <code>fork()</code> when only a single test is run by name with
-the function <code>run_single_test()</code>. And if you want to debug, you can
-obviously set a breakpoint at that test (but note that its actual name
-probably have been mangled). But since <strong>Cgreen</strong> does some book-keeping
-before actually getting to the test, a better function is the one
-simply called <code>run()</code>.</p>
-</div>
-<div class="paragraph">
 <p>Building this scaffolding&#8230;&#8203;</p>
 </div>
 <div class="listingblock">
@@ -945,8 +948,8 @@ $ gcc words_test.o all_tests.o -lcgreen -o all_tests</pre>
 <div class="listingblock">
 <div class="content">
 <pre>Running "main" (0 tests)...
-Completed "words_tests": 0 passes, 0 failures, 0 exceptions in 0ms.
-Completed "main": 0 passes, 0 failures, 0 exceptions in 0ms.</pre>
+Completed "words_tests":  in 42ms.
+Completed "main":  in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1031,8 +1034,8 @@ words_tests.c:13: Failure: words_tests -&gt; returns_word_count
 		actual value:			[0]
 		expected value:			[4]
 
-Completed "words_tests": 0 passes, 1 failure, 0 exceptions in 1ms.
-Completed "main": 0 passes, 1 failure, 0 exceptions in 1ms.</pre>
+Completed "words_tests": 1 failure in 42ms.
+Completed "main": 1 failure in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1070,8 +1073,8 @@ int split_words(char *sentence) {
 <div class="listingblock">
 <div class="content">
 <pre>Running "main" (1 tests)...
-Completed "words_tests": 1 pass, 0 failures, 0 exceptions in 2ms.
-Completed "main": 1 pass, 0 failures, 0 exceptions in 2ms.</pre>
+Completed "words_tests": 1 pass in 42ms.
+Completed "main": 1 pass in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1109,8 +1112,8 @@ words_tests.c:21: Failure: words_tests -&gt; converts_spaces_to_zeroes
 		actual value:			[-32]
 		expected value:			[0]
 
-Completed "words_tests": 1 pass, 1 failure, 0 exceptions in 1ms.
-Completed "main": 1 pass, 1 failure, 0 exceptions in 1ms.</pre>
+Completed "words_tests": 1 pass, 1 failure in 42ms.
+Completed "main": 1 pass, 1 failure in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1146,8 +1149,8 @@ words_tests.c:13: Failure: words_tests -&gt; returns_word_count
 		actual value:			[2]
 		expected value:			[4]
 
-Completed "words_tests": 1 pass, 1 failure, 0 exceptions in 2ms.
-Completed "main": 1 pass, 1 failure, 0 exceptions in 2ms.</pre>
+Completed "words_tests": 1 pass, 1 failure in 42ms.
+Completed "main": 1 pass, 1 failure in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1171,8 +1174,8 @@ call in our loop.  Moving the length calculation out of the loop&#8230;&#8203;</
 <div class="listingblock">
 <div class="content">
 <pre>Running "main" (2 tests)...
-Completed "words_tests": 2 passes, 0 failures, 0 exceptions in 1ms.
-Completed "main": 2 passes, 0 failures, 0 exceptions in 1ms.</pre>
+Completed "words_tests": 2 passes in 42ms.
+Completed "main": 2 passes in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1211,9 +1214,9 @@ sure it walks the sentence correctly, dispatching individual words as
 it goes. So what calls are made are very important. How to test this?</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s start with a one word sentence. In this case we would expect the
-callback to be invoked once with the only word, right? Here is the
-test for that&#8230;&#8203;</p>
+<p>Let&#8217;s start with a one word sentence. In this case we would expect
+the callback to be invoked once with the only word, right? Here is
+the test for that&#8230;&#8203;</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1242,17 +1245,17 @@ TestSuite *words_tests() {
 <p>What is the funny looking <code>mock()</code> function?</p>
 </div>
 <div class="paragraph">
-<p>A mock is basically a programmable object. In C objects are limited to
-functions, so this is a mock function. The macro <code>mock()</code> compares the
-incoming parameters with any expected values and dispatches messages
-to the test suite if there is a mismatch. It also returns any values
-that have been preprogrammed in the test.</p>
+<p>A mock is basically a programmable object. In C objects are limited
+to functions, so this is a mock function. The macro <code>mock()</code> compares
+the incoming parameters with any expected values and dispatches
+messages to the test suite if there is a mismatch. It also returns
+any values that have been preprogrammed in the test.</p>
 </div>
 <div class="paragraph">
 <p>The test is <code>invokes_callback_once_for_single_word_sentence()</code>. It
 programs the mock function using the <code>expect()</code> macro. It expects a
-single call, and that single call should use the parameters <code>"Word"</code> and
-<code>NULL</code>. If they don&#8217;t match, we will get a test failure.</p>
+single call, and that single call should use the parameters <code>"Word"</code>
+and <code>NULL</code>. If they don&#8217;t match, we will get a test failure.</p>
 </div>
 <div class="paragraph">
 <p>So when the code under test (our <code>words()</code> function) calls the
@@ -1264,7 +1267,8 @@ actual parameters.</p>
 a test.</p>
 </div>
 <div class="paragraph">
-<p>For a successful compile and link, the <code>words.h</code> file must now look like&#8230;&#8203;</p>
+<p>For a successful compile and link, the <code>words.h</code> file must now look
+like&#8230;&#8203;</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1290,13 +1294,13 @@ void words(const char *sentence, void (*callback)(const char *, void *), void *m
 words_tests.c:33: Failure: words_tests -&gt; invokes_callback_once_for_single_word_sentence
 	Expected call was not made to mocked function [mocked_callback]
 
-Completed "words_tests": 2 passes, 1 failure, 0 exceptions in 1ms.
-Completed "main": 2 passes, 1 failure, 0 exceptions in 1ms.</pre>
+Completed "words_tests": 2 passes, 1 failure in 42ms.
+Completed "main": 2 passes, 1 failure in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
-<p><strong>Cgreen</strong> reports that the callback was never invoked. We can easily get
-the test to pass by filling out the implementation with&#8230;&#8203;</p>
+<p><strong>Cgreen</strong> reports that the callback was never invoked. We can easily
+get the test to pass by filling out the implementation with&#8230;&#8203;</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1313,8 +1317,8 @@ although it doesn&#8217;t drive much functionality yet.</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running "main" (3 tests)...
-Completed "words_tests": 4 passes, 0 failures, 0 exceptions in 1ms.
-Completed "main": 4 passes, 0 failures, 0 exceptions in 1ms.</pre>
+Completed "words_tests": 4 passes in 42ms.
+Completed "main": 4 passes in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1334,8 +1338,8 @@ add to <code>words_test.c</code>&#8230;&#8203;</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Each call is expected in sequence. Any failures, or left-over or extra
-calls, and we get failures. We can see all this when we run the
+<p>Each call is expected in sequence. Any failures, or left-over or
+extra calls, and we get failures. We can see all this when we run the
 tests&#8230;&#8203;</p>
 </div>
 <div class="listingblock">
@@ -1355,8 +1359,8 @@ words_tests.c:40: Failure: words_tests -&gt; invokes_callback_for_each_word_in_a
 words_tests.c:41: Failure: words_tests -&gt; invokes_callback_for_each_word_in_a_phrase
 	Expected call was not made to mocked function [mocked_callback]
 
-Completed "words_tests": 4 passes, 4 failures, 0 exceptions in 1ms.
-Completed "main": 4 passes, 4 failures, 0 exceptions in 1ms.</pre>
+Completed "words_tests": 4 passes, 4 failures in 42ms.
+Completed "main": 4 passes, 4 failures in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1389,37 +1393,17 @@ earlier&#8230;&#8203;</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running "main" (4 tests)...
-Completed "words_tests": 8 passes, 0 failures, 0 exceptions in 1ms.
-Completed "main": 8 passes, 0 failures, 0 exceptions in 1ms.</pre>
+Completed "words_tests": 8 passes in 42ms.
+Completed "main": 8 passes in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
 <p>More work than I like to admit as it took me three goes to get this
 right. I firstly forgot the <code>+ 1</code> added on to <code>strlen()</code>, then forgot
-to swap <code>sentence</code> for <code>word</code> in the <code>(*callback)()</code> call, and finally
-third time lucky. Of course running the tests each time made these
-mistakes very obvious. It&#8217;s taken me far longer to write these
+to swap <code>sentence</code> for <code>word</code> in the <code>(*callback)()</code> call, and
+finally third time lucky. Of course running the tests each time made
+these mistakes very obvious. It&#8217;s taken me far longer to write these
 paragraphs than it has to write the code.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_using_cgreen_with_c">1.6. Using Cgreen with C++</h3>
-<div class="paragraph">
-<p>The above example, as well as most of this guide, shows how to uses
-<strong>CGreen</strong> with C. You can also use <strong>CGreen</strong> with C++. This is actually
-quite simple. If you have installed the <strong>Cgreen</strong> library for C++ all you
-have to do is</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Use the <code>cgreen</code> name space by adding <code>using namespace cgreen;</code> at
-the beginning of the file with your tests</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>There is also one extra feature when you use C++, the <code>assert_throws</code> function.</p>
 </div>
 </div>
 </div>
@@ -1431,10 +1415,10 @@ the beginning of the file with your tests</p>
 <p><strong>Cgreen</strong> is a tool for building unit tests in the C or C++
 languages. These are usually written alongside the production code by
 the programmer to prevent bugs. Even though the test suites are
-created by software developers, they are intended to be human readable
-C code, as part of their function is an executable specification.
-Used in this way, the test harness delivers constant quality
-assurance.</p>
+created by software developers, they are intended to be human
+readable C code, as part of their function is an executable
+specification. Used in this way, the test harness delivers constant
+quality assurance.</p>
 </div>
 <div class="paragraph">
 <p>In other words you&#8217;ll get less bugs.</p>
@@ -1442,9 +1426,9 @@ assurance.</p>
 <div class="sect2">
 <h3 id="_writing_basic_tests">2.1. Writing Basic Tests</h3>
 <div class="paragraph">
-<p><strong>Cgreen</strong> tests are simply C, or C++, functions with no parameters and
+<p><strong>Cgreen</strong> tests are like C, or C++, functions with no parameters and
 no return value. To signal that they actually are tests we mark them
-with the <code>Ensure</code> macro. An example might be&#8230;&#8203;</p>
+with the <code>Ensure</code> macro. Here&#8217;s an example&#8230;&#8203;</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1455,7 +1439,7 @@ with the <code>Ensure</code> macro. An example might be&#8230;&#8203;</p>
 </div>
 <div class="paragraph">
 <p>The <code>Ensure</code> macro takes two arguments (in the BDD style) where the
-first is the Subject Under Test (SUT) which must be declared with the
+first is the System Under Test (SUT) which must be declared with the
 <code>Describe</code> macro.</p>
 </div>
 <div class="listingblock">
@@ -1469,16 +1453,22 @@ long as it fullfills the rules for an identifier in C and C++. A
 typical way to choose the named of the tests is what we see here,
 reading the declaration of the test makes sense since it is almost
 plain english, "Ensure strlen returns five for 'hello'". No problem
-understanding what we aim to test. And it can be viewed as an example
-from a description of what strlen should be able to do. In a way,
-extracting all the <code>Ensure</code>:s from your test might give you all the
-documentation you&#8217;ll need.</p>
+understanding what we aim to test, or in TDD lingo, test drive. And
+it can be viewed as an example from a description of what strlen
+should be able to do. In a way, extracting all the <code>Ensure</code>:s from
+your test might give you all the documentation you&#8217;ll need.</p>
 </div>
 <div class="paragraph">
-<p>The <code>assert_that()</code> call is the primary part of an assertion, which is
-complemented with a constraint, in this case <code>is_equal_to()</code>, as a
-parameter. This makes a very fluent interface to the asserts, that
-actually reads like English.</p>
+<p>The call to <code>assert_that()</code> is the primary part of an assertion,
+which is complemented with a constraint, in this case
+<code>is_equal_to()</code>, as a parameter. This makes a very fluent interface
+to the asserts, that actually reads like English. The general format
+is then</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-C" data-lang="C">assert_that(actual, &lt;constraint&gt;);</code></pre>
+</div>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1515,8 +1505,13 @@ results.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Passes if actual value/expression&#8230;&#8203;</strong></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Basic</em></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_true</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">evaluates to true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">evaluates to true, buy you can also just leave out the constraint,
+              e.g. <code>assert_that(found)</code> if <code>found</code> is of boolean type</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_false</code></p></td>
@@ -1531,12 +1526,24 @@ results.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">is a non null value</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_not_null</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">d:o</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Integer compatible</em></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_equal_to(value)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">'== value'</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_equal_to_hex(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'== value', but will show values in HEX</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_not_equal_to(value)</code></p></td>
@@ -1555,15 +1562,27 @@ results.</p>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Structs and general data</em></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_equal_to_contents_of(pointer, size)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">matches the data pointed to by <code>pointer</code> to a size of <code>size</code> bytes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">matches the data pointed
+                                             to by <code>pointer</code> to a size
+                                             of <code>size</code> bytes</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_not_equal_to_contents_of(pointer, size)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">does not match the data pointed to by <code>pointer</code> to a size of <code>size</code> bytes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">does not match the data
+                                                 pointed to by <code>pointer</code>
+                                                 to a size of <code>size</code> bytes</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Strings</em></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -1580,23 +1599,43 @@ results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>does_not_contain_string(value)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">does not contain <code>value</code> when evaluated using <code>strstr()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">does not contain <code>value</code> when evaluated
+                                     using <code>strstr()</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>begins_with_string(value)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">starts with the string <code>value</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>does_not_begin_with_string(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">does not start with the string <code>value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ends_with_string(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ends with the string <code>value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>does_not_end_with_string(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">does not end with the string <code>value</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Double floats</em></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_equal_to_double(value)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">are equal to <code>value</code> within the number of significant digits (which you can set with a call to <code>significant_figures_for_assert_double_are(int figures)</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">are equal to <code>value</code> within the number of
+                                significant digits (which you can set with a call
+                                to <code>significant_figures_for_assert_double_are(int figures)</code>)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_not_equal_to_double(value)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">are not equal to <code>value</code> within the number of significant digits</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">are not equal to <code>value</code> within the number of
+                                    significant digits</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_less_than_double(value)</code></p></td>
@@ -1613,16 +1652,54 @@ results.</p>
 assertions accept anything that can be cast to <code>intptr_t</code> and simply
 perform an <code>==</code> operation. The string comparisons are slightly
 different in that they use the <code>&lt;string.h&gt;</code> library function
-<code>strcmp()</code>.  If <code>is_equal_to()</code> is used on <code>char *</code> pointers then the
-pointers have to point at the same string to pass.</p>
+<code>strcmp()</code>.  If you use <code>is_equal_to()</code> with <code>char *</code> pointers then
+it is the value of the pointers themselves that has to be the same,
+i.e. the pointers have to point at the same string for the test to
+pass.</p>
 </div>
 <div class="paragraph">
-<p>A cautionary note about the constraints is that you cannot use C/C++
-string literal concatenation (like "don&#8217;t" "use" "string"
-"concatenation") in the parameters to the constraints. If you do, you
-will get weird error messages about missing arguments to the
-constraint macros. This is caused by the macros using argument strings
-to produce nice failure messages.</p>
+<p>The constraints above should be used as the second argument to one of the
+assertion functions:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Assertion</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Description</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>assert_that(expected, constraint)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Passes if <code>expected</code> fullfulls <code>constraint</code>,
+                                        to be used for all assertions except <code>double</code>
+                                        type values</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>assert_that_double(expected, constraint)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Passes if <code>expected</code> fullfulls <code>constraint</code>,
+                                               only to be used for assertions on <code>double</code>
+                                               type values</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+You cannot use C/C++ string literal concatenation (like
+<code>"don&#8217;t" "use" "string" "concatenation"</code>) in the parameters to the
+constraints. If you do, you will get weird error messages about missing
+arguments to the constraint macros. This is caused by the macros using
+argument  strings to produce nice failure messages.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -1651,9 +1728,10 @@ to produce nice failure messages.</p>
 <h3 id="_bdd_style_vs_tdd_style">2.4. BDD Style vs. TDD Style</h3>
 <div class="paragraph">
 <p>So far we have encouraged the modern BDD style. It has merits that we
-really want you to benefit from. But you might come across another
-style, the standard TDD style, which is more inline with previous
-thinking and might be more similar to other frameworks.</p>
+really want you to benefit from. But you might come across <strong>Cgreen</strong>
+test in another style, more like the standard TDD style, which is
+more inline with previous thinking and might be more similar to other
+frameworks.</p>
 </div>
 <div class="paragraph">
 <p>The only difference, in principle, is the use of the SUT or
@@ -1805,11 +1883,13 @@ assertion macros:</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>assert_string_equal(char *, char *)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Uses 'strcmp()' and passes if the strings are equal</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Uses 'strcmp()' and passes if
+                                          the strings are equal</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>assert_string_not_equal(char *, char *)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Uses 'strcmp()' and fails if the strings are equal</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Uses 'strcmp()' and fails
+                                              if the strings are equal</p></td>
 </tr>
 </tbody>
 </table>
@@ -1892,9 +1972,9 @@ constraints based assertions.
 <div class="sect2">
 <h3 id="_a_runner">2.6. A Runner</h3>
 <div class="paragraph">
-<p>The tests are only run through running a test suite in some form. We
-can create and run one especially for this test like so&#8230;&#8203; (But see
-also <a href="#runner">Automatic Test Discovery</a>.)</p>
+<p>The tests are only run by running a test suite in some form. (But see
+also <a href="#runner">Automatic Test Discovery</a>.) We can create and run one especially for this test like
+so&#8230;&#8203;</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1969,7 +2049,7 @@ int main(int argc, char **argv) {
 $ gcc strlen_test.o -lcgreen -o strlen_test
 $ ./strlen_test
 Running "our_tests" (1 tests)...
-Completed "our_tests": 1 pass, 0 failures, 0 exceptions in 1ms.</pre>
+Completed "our_tests": 1 pass in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1995,7 +2075,7 @@ strlen_tests.c:9: Failure: returns_five_for_hello
 		actual value:			[4]
 		expected value:			[5]
 
-Completed "our_tests": 0 passes, 1 failure, 0 exceptions in 1ms.</pre>
+Completed "our_tests": 1 failure in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2224,9 +2304,9 @@ test suites, <strong>Cgreen</strong> runs every test in its own process.</p>
 <div class="paragraph">
 <p>Just before calling the <code>BeforeEach()</code> (or <code>setup</code>) function, <strong>Cgreen</strong>
 <code>fork()</code>:s. The main process waits for the test to complete normally
-or die. This includes the calling the <code>AfterEach()</code>(or <code>teardown</code>)
+or die. This includes calling the <code>AfterEach()</code>(or <code>teardown</code>)
 function, if any. If the test process dies, an exception is reported
-and the main test process carries on.</p>
+and the main test process carries on with the next test.</p>
 </div>
 <div class="paragraph">
 <p>For example&#8230;&#8203;</p>
@@ -2259,15 +2339,16 @@ int main(int argc, char **argv) {
 <div class="content">
 <pre>Running "main" (1 tests)...
 crash_tests.c:8: Exception: seg_faults_for_null_dereference
-	Test terminated with signal: Segmentation fault: 11
+	Test terminated with signal: Segmentation fault
 
-Completed "main": 0 passes, 0 failures, 1 exception in 1447ms.</pre>
+Completed "main": 1 exception in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The obvious thing to do now is to fire up the debugger. Unfortunately,
-the constant <code>fork()</code>:ing of <strong>Cgreen</strong> can be an extra complication too
-many when debugging. It&#8217;s enough of a problem to find the bug.</p>
+<p>The normal thing to do in this situation is to fire up the
+debugger. Unfortunately, the constant <code>fork()</code>:ing of <strong>Cgreen</strong> can be
+one extra complication too many when debugging. It&#8217;s enough of a
+problem to find the bug.</p>
 </div>
 <div class="paragraph">
 <p>To get around this, and also to allow the running of one test at a
@@ -2300,7 +2381,7 @@ crashing test&#8230;&#8203;</p>
 </div>
 </div>
 <div class="paragraph">
-<p>When run in this way, <strong>Cgreen</strong> will not <code>fork()</code>.</p>
+<p>When run in this way, <strong>Cgreen</strong> will not <code>fork()</code>. But see also <a href="#no-fork">No fork, please</a>.</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -2393,12 +2474,12 @@ int main(int argc, char **argv) {
 <div class="content">
 <pre>Running "main" (2 tests)...
 crash_tests.c:8: Exception: seg_faults_for_null_dereference
-	Test terminated with signal: Segmentation fault: 11
+	Test terminated with signal: Segmentation fault
 
 crash_tests.c:13: Exception: will_loop_forever
 	Test terminated unexpectedly, likely from a non-standard exception or Posix signal
 
-Completed "main": 0 passes, 0 failures, 2 exceptions in 1087ms.</pre>
+Completed "main": 2 exceptions in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2420,7 +2501,54 @@ run.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_building_composite_test_suites">2.9. Building Composite Test Suites</h3>
+<h3 id="no-fork">2.9. No fork, please</h3>
+<div class="paragraph">
+<p><strong>Cgreen</strong> protects itself from being torn down by an exception in a
+test by <code>fork()</code>-ing each test into a separate process. A catastrophic
+error will then only affect the child process for that specific test
+and <strong>Cgreen</strong> can catch it, rather than crashing too. It can then
+report the exception and continue with the next test.</p>
+</div>
+<div class="paragraph">
+<p>If you want to debug any of your tests the constant <code>fork()</code>-ing
+might make that difficult or impossible. There are also other
+circumstances that might require that you don&#8217;t use <code>fork()</code>.</p>
+</div>
+<div class="paragraph">
+<p>There are two ways to make <strong>Cgreen</strong> refrain from <code>fork()</code>-ing.</p>
+</div>
+<div class="paragraph">
+<p><strong>Cgreen</strong> does not <code>fork()</code> when only a single test is run by name with
+the function <code>run_single_test()</code>. To debug you can then obviously set
+a breakpoint at that test (but note that its actual name probably have
+been mangled). <strong>Cgreen</strong> does some book-keeping before actually getting
+to the test, so a function easier to find might be the one simply
+called <code>run()</code>.</p>
+</div>
+<div class="paragraph">
+<p>The second way is to define the environment variable
+<code>CGREEN_NO_FORK</code>. If <strong>Cgreen</strong> can get that variable from the
+environment using <code>getenv()</code> it will run the test(s) in the same
+process. In this case the non-forking applies to <strong>all</strong> tests run, so
+all test will run in the same process, namely *Cgreen*s main process.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+This might bring your whole test suite down if a single test
+causes an exception. So it is not a recommended setting for normal
+use.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_building_composite_test_suites">2.10. Building Composite Test Suites</h3>
 <div class="paragraph">
 <p>The <code>TestSuite</code> is a composite structure.  This means test suites can
 be added to test suites, building a tree structure that will be
@@ -2604,7 +2732,7 @@ purpose is to wrap the main test suite in the fixture.  This is our
 two sets of fixtures in the same test script.</p>
 </div>
 <div class="paragraph">
-<p>We have the MySQL connection fixture.  This is runs
+<p>We have the MySQL connection fixture.  This will run
 <code>open_connection()</code> and <code>close_connection()</code> just once at the
 beginning and end of the person tests.  This is because the <code>suite</code>
 pointer is the only member of <code>fixture</code>.</p>
@@ -2651,299 +2779,12 @@ TestSuite *connection_fixture(TestSuite *suite) {
 </div>
 </div>
 <div class="sect1">
-<h2 id="runner">3. Automatic Test Discovery</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_forgot_to_add_your_test">3.1. Forgot to Add Your Test?</h3>
-<div class="paragraph">
-<p>When we write a new test we focus on the details about the test we are
-trying to write. And writing tests is no trivial matter so this might
-well take a lot of brain power.</p>
-</div>
-<div class="paragraph">
-<p>So, it comes as no big surprise, that sometimes you write your test
-and then forget to add it to the suite. When we run it it appears that it
-passed on the first try! Although this <strong>should</strong> really make you
-suspicious, sometimes you get so happy that you just continue with
-churning out more tests and more code. It&#8217;s not until some (possibly
-looong) time later that you realize, after much headache and
-debugging, that the test did not actually pass. It was never even run!</p>
-</div>
-<div class="paragraph">
-<p>There are practices to minimize the risk of this happening, such as
-always running the test as soon as you can set up the test. This way
-you will see it fail before trying to get it to pass.</p>
-</div>
-<div class="paragraph">
-<p>But it is still a practice, something we, as humans, might fail to do
-at some point. Usually this happens when we are most stressed and in
-need of certainty.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_the_solution_the_cgreen_runner">3.2. The Solution - the 'cgreen-runner'</h3>
-<div class="paragraph">
-<p><strong>Cgreen</strong> gives you a tool to avoid not only the risk of this
-happening, but also the extra work and extra code. It is called the
-<code>cgreen-runner</code>.</p>
-</div>
-<div class="paragraph">
-<p>The <code>cgreen-runner</code> should come with your <strong>Cgreen</strong> installation if
-your platform supports the technique that is required, which is
-'programatic access to dynamic loading of libraries'. This means
-that a program can load an external library of code into memory and
-inspect it. Kind of self-inspection, or reflexion.</p>
-</div>
-<div class="paragraph">
-<p>So all you have to do is to build a dynamically loadable library of
-all tests (and of course your objects under test and other necessary
-code). Then you can run the <code>cgreen-runner</code> and point it to the
-library. The runner will then load the library, enumerate all tests in
-it, and run every test.</p>
-</div>
-<div class="paragraph">
-<p>It&#8217;s automatic, and there is nothing to forget.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_using_the_runner">3.3. Using the Runner</h3>
-<div class="paragraph">
-<p>Assuming your tests are in <code>first_test.c</code> the typical command to
-build your library using <code>gcc</code> would be</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ gcc -shared -o first_test.so -fPIC first_test.c -lcgreen</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>-fPIC</code> means to generate 'position independent code' which is
-required if you want to load the library dynamically.</p>
-</div>
-<div class="paragraph">
-<p>How to build a dynamically loadable shared library might vary a lot
-depending on your platform. Can&#8217;t really help you there, sorry!</p>
-</div>
-<div class="paragraph">
-<p>As soon as we have linked it we can run the tests using the
-<code>cgreen-runner</code> by just giving it the shared, dynamically loadable,
-object library as an argument:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ cgreen-runner first_test.so
-Running "first_tests" (2 tests)...
-first_tests.c:12: Failure: Cgreen -&gt; fails_this_test
-	Expected [0 == 1] to [be true]
-
-Completed "Cgreen": 1 pass, 1 failure, 0 exceptions in 1ms.
-Completed "first_tests": 1 pass, 1 failure, 0 exceptions in 1ms.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>More or less exactly the same output as when we ran our first test in
-the beginning of this quickstart tutorial. We can see that the top
-level of the tests will be named as the library it was discovered in,
-and the second level is the context for our Subject Under Test, in
-this case 'Cgreen'. We also see that the context is mentioned in the
-failure message, giving a fairly obvious 'Cgreen &#8594; fails_this_test'.</p>
-</div>
-<div class="paragraph">
-<p>Now we can actually delete the main function in our source code. We
-don&#8217;t need all this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">int main(int argc, char **argv) {
-    TestSuite *suite = create_test_suite();
-    add_test_with_context(suite, Cgreen, passes_this_test);
-    add_test_with_context(suite, Cgreen, fails_this_test);
-    return run_test_suite(suite, create_text_reporter());
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>It always feel good to delete code, right?</p>
-</div>
-<div class="paragraph">
-<p>We can also select which test to run:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ cgreen-runner first_test.so Cgreen:this_test_should_fail
-Running "first_tests" (1 tests)...
-first_tests.c:12: Failure: Cgreen -&gt; fails_this_test
-	Expected [0 == 1] to [be true]
-
-Completed "Cgreen": 0 passes, 1 failure, 0 exceptions in 0ms.
-Completed "first_tests": 0 passes, 1 failure, 0 exceptions in 0ms.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>We recommend the BDD notation to discover tests, and you indicate
-which context the test we want to run is in. In this case <code>Cgreen</code> so
-the test should be refered to as <code>Cgreen:this_test_should_fail</code>.</p>
-</div>
-<div class="paragraph">
-<p>If you don&#8217;t use the BDD notation there is actually a context anyway,
-it is called <code>default</code>.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="runner-options">3.4. Cgreen Runner Options</h3>
-<div class="paragraph">
-<p>Once you get the build set up right for the cgreen-runner everything
-is fairly straight-forward. But you have a few options:</p>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">--xml &lt;prefix&gt;</dt>
-<dd>
-<p>Instead of messages on stdout with the TextReporter,
-  write results into one XML-file per suite or context,
-compatible with Hudson/Jenkins CI. The filename(s)
-will be <code>&lt;prefix&gt;-&lt;suite&gt;.xml</code></p>
-</dd>
-<dt class="hdlist1">--suite &lt;name&gt;</dt>
-<dd>
-<p>Name the top level suite</p>
-</dd>
-<dt class="hdlist1">--no-run</dt>
-<dd>
-<p>Don&#8217;t run the tests</p>
-</dd>
-<dt class="hdlist1">--verbose</dt>
-<dd>
-<p>Show progress information and list discovered tests</p>
-</dd>
-<dt class="hdlist1">--colours</dt>
-<dd>
-<p>Use colours (or colors) to emphasis result (requires ANSI-capable terminal)</p>
-</dd>
-<dt class="hdlist1">--quiet</dt>
-<dd>
-<p>Be more quiet</p>
-</dd>
-</dl>
-</div>
-<div class="paragraph">
-<p>The <code>verbose</code> option is particularly handy since it will give you the
-actual names of all tests discovered. So if you have long test names
-you can avoid mistyping them by copying and pasting from the output of
-<code>cgreen-runner --verbose</code>. It will also give the mangled name of the
-test which should make it easier to find in the debugger. Here&#8217;s an
-example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Discovered Cgreen:fails_this_test (Cgreen__fails_this_test)
-Discovered Cgreen:passes_this_test (Cgreen__passes_this_test)
-Discovered 2 test(s)
-Opening [first_tests.so] to only run one test: 'Cgreen:fails_this_test' ...
-Running "first_tests" (1 tests)...
-first_tests.c:12: Failure: Cgreen -&gt; fails_this_test
-	Expected [0 == 1] to [be true]
-
-Completed "Cgreen": 0 passes, 1 failure, 0 exceptions in 0ms.
-Completed "first_tests": 0 passes, 1 failure, 0 exceptions in 0ms.</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_selecting_tests_to_run">3.5. Selecting Tests To Run</h3>
-<div class="paragraph">
-<p>You can name a single test to be run by giving it as the last argument
-on the command line. The name should be in the format
-<code>&lt;SUT&gt;:&lt;test&gt;</code>. If not obvious you can get that name by using the
-<code>--verbose</code> command option which will show you all tests discovered
-and both there C/C++ and Cgreen names. Copying the Cgreen name from
-that output is an easy way to run only that particular test. When a
-single test is named it is run using <code>run_single_test()</code>. As described
-in <a href="#tdd_with_cgreen">Five Minutes Doing TDD with Cgreen</a> this means that it is <em>not</em> protected by
-<code>fork()</code>-ing it to run in its own process.</p>
-</div>
-<div class="paragraph">
-<p>The <code>cgreen-runner</code> supports selecting tests with limited pattern
-matching. Using an asterisk as a simple 'match many' symbol you can
-say things like</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ cgreen-runner &lt;library&gt; Cgreen:*
-$ cgreen-runner &lt;library&gt; C*:*this*</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_multiple_test_libraries">3.6. Multiple Test Libraries</h3>
-<div class="paragraph">
-<p>You can also run tests in multiple libraries in one go by adding them
-to the <code>cgreen-runner</code> command:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ cgreen-runner first_set.so second_set.so ...</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_setup_teardown_and_custom_reporters">3.7. Setup, Teardown and Custom Reporters</h3>
-<div class="paragraph">
-<p>The <code>cgreen-runner</code> will only run setup and teardown functions if you
-use the BDD-ish style with <code>BeforeEach()</code> and <code>AfterEach()</code> as
-described above. The runner does not pickup <code>setup()</code> and <code>teardown()</code>
-added to suites, because it actually doesn&#8217;t run suites. It discovers
-all tests and runs them one by one. The macros required by the BDD-ish
-style ensures that the corresponding <code>BeforeEach()</code> and <code>AfterEach()</code>
-are run before and after each test.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-The <code>cgreen-runner</code> <em>will</em> discover your tests in a shared library
-even if you don&#8217;t use the BDD-ish style. But it will not run the
-<code>setup()</code> and/or <code>teardown()</code> attached to your suite(s). But in case
-you have non-BDD style tests <em>without</em> any <code>setup()</code> and/or
-<code>teardown()</code> you can still use the runner. The default suite/context
-where the tests live in this case is called <code>default</code>. But why don&#8217;t
-you convert your tests to BDD notation? This would save you from the
-frustrating trouble-shooting that you risk when you added <code>setup()</code>
-and <code>teardown()</code> and can&#8217;t understand why they are not run&#8230;&#8203;
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>So, the runner incourages you to use the BDD notation. But since we
-recommend that you do anyway, that&#8217;s no extra problem if you are
-starting out from scratch. But see <a href="#changing_style">Changing Style</a>
-for some easy tips on how to get you there if you already have non-BDD
-tests.</p>
-</div>
-<div class="paragraph">
-<p>You can choose between the TextReporter, which we have been seeing so
-far, and the built-in JUnit/Ant compatible XML-reporter using the
-<code>--xml</code> option. But it is not currently possible to use custom
-reporters as outlined in <a href="#reporter">Changing Cgreen Reporting</a> with the runner.</p>
-</div>
-<div class="paragraph">
-<p>If you require another custom reporter you need to resort to the
-standard, programatic, way of invoking your tests. For now&#8230;&#8203;</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_mocking_functions_with_cgreen">4. Mocking functions with Cgreen</h2>
+<h2 id="_mocking_functions_with_cgreen">3. Mocking functions with Cgreen</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>When testing you want certainty above all else.  Random events destroy
 confidence in your test suite and force needless extra runs "to be
-sure".  A good test places the subject under test into a tightly
+sure".  A good test places the system under test into a tightly
 controlled environment.  A test chamber if you like.  This makes the
 tests fast, repeatable and reliable.</p>
 </div>
@@ -2952,7 +2793,7 @@ tests fast, repeatable and reliable.</p>
 outgoing calls from the code under test.  We won&#8217;t believe our test
 failure if our code is making calls to the internet for example.  The
 internet can fail all by itself.  Not only do we not have total
-control, but it means we have to get dependent components working
+control, but it also means we have to get dependent components working
 before we can test the higher level code.  This makes it difficult to
 code top down.</p>
 </div>
@@ -2967,7 +2808,7 @@ is eventually fleshed out.</p>
 <strong>Cgreen</strong> encourages this approach by making such tests easier to write.</p>
 </div>
 <div class="sect2">
-<h3 id="_the_problem_with_streams">4.1. The Problem with Streams</h3>
+<h3 id="_the_problem_with_streams">3.1. The Problem with Streams</h3>
 <div class="paragraph">
 <p>How would we test the following code&#8230;&#8203;?</p>
 </div>
@@ -3047,7 +2888,7 @@ programmable function for all our tests.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_record_and_playback">4.2. Record and Playback</h3>
+<h3 id="_record_and_playback">3.2. Record and Playback</h3>
 <div class="paragraph">
 <p>We can redo our example by creating a <code>stream_stub()</code> function. We can
 call it anything we want, and since I thought we wanted to have a
@@ -3107,8 +2948,8 @@ when called.</td>
 <div class="listingblock">
 <div class="content">
 <pre>Running "stream" (1 tests)...
-Completed "ParagraphReader": 1 pass, 0 failures, 0 exceptions in 1ms.
-Completed "stream": 1 pass, 0 failures, 0 exceptions in 1ms.</pre>
+Completed "ParagraphReader": 1 pass in 42ms.
+Completed "stream": 1 pass in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3149,11 +2990,11 @@ that will be given back once the test proper starts.</p>
 <pre>Running "stream" (2 tests)...
 stream_tests.c:23: Failure: ParagraphReader -&gt; gives_one_character_line_for_one_character_stream
 	Expected [line] to [equal string] ["a"]
-		actual value:			[""]
+		actual value:			["¡"]
 		expected to equal:		["a"]
 
-Completed "ParagraphReader": 1 pass, 1 failure, 0 exceptions in 1ms.
-Completed "stream": 1 pass, 1 failure, 0 exceptions in 1ms.</pre>
+Completed "ParagraphReader": 1 pass, 1 failure in 42ms.
+Completed "stream": 1 pass, 1 failure in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3197,15 +3038,15 @@ Completed "stream": 1 pass, 1 failure, 0 exceptions in 1ms.</pre>
 <div class="listingblock">
 <div class="content">
 <pre>Running "stream" (2 tests)...
-Completed "ParagraphReader": 2 passes, 0 failures, 0 exceptions in 1ms.
-Completed "stream": 2 passes, 0 failures, 0 exceptions in 1ms.</pre>
+Completed "ParagraphReader": 2 passes in 42ms.
+Completed "stream": 2 passes in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>How do the <strong>Cgreen</strong> stubs work?  Each <code>expect()</code> describes one call to
-the stub and the calls to <code>will_return()</code> build up a static list of
-return values which are used and returned in order as those calls
-arrive. The return values are cleared between tests.</p>
+<p>So, how do the <strong>Cgreen</strong> stubs work?  Each <code>expect()</code> describes one
+call to the stub and a call to <code>will_return()</code> is included it will
+aggregate into a list of return values which are used and returned in
+order as the expected calls arrive.</p>
 </div>
 <div class="paragraph">
 <p>The <code>mock()</code> macro captures the parameter names and the <code><em>func</em></code>
@@ -3214,7 +3055,7 @@ to look up entries in the return list, and also to generate more
 helpful messages.</p>
 </div>
 <div class="paragraph">
-<p>We can crank out our tests quite quickly now&#8230;&#8203;</p>
+<p>We can now crank out our tests quite quickly&#8230;&#8203;</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3279,7 +3120,7 @@ the stream beyond the line ending, we want to fail.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>Running "stream"" (5 tests)...
+<pre>Running "stream" (5 tests)...
 stream_tests.c:40: Failure: ParagraphReader -&gt; drops_line_ending_from_word_and_stops
 	Expected [read_paragraph(&amp;stream_stub, ((void *)0))] to [equal string] ["the"]
 		actual value:			["the
@@ -3292,8 +3133,8 @@ stream_tests.c:45: Failure: ParagraphReader -&gt; gives_empty_line_for_single_li
 "]
 		expected to equal:		[""]
 
-Completed "ParagraphReader": 3 passes, 2 failures, 0 exceptions in 2ms.
-Completed "stream"": 3 passes, 2 failures, 0 exceptions in 2ms.</pre>
+Completed "ParagraphReader": 3 passes, 2 failures in 42ms.
+Completed "stream": 3 passes, 2 failures in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3327,8 +3168,8 @@ Another fix later&#8230;&#8203;</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running "stream" (5 tests)...
-Completed "ParagraphReader": 5 passes, 0 failures, 0 exceptions in 2ms.
-Completed "stream": 5 passes, 0 failures, 0 exceptions in 2ms.</pre>
+Completed "ParagraphReader": 5 passes in 42ms.
+Completed "stream": 5 passes in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3392,7 +3233,7 @@ mock objects.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_setting_expectations_on_mock_functions">4.3. Setting Expectations on Mock Functions</h3>
+<h3 id="_setting_expectations_on_mock_functions">3.3. Setting Expectations on Mock Functions</h3>
 <div class="paragraph">
 <p>To swap the traffic flow, we&#8217;ll look at an outgoing example instead.
 Here is the prewritten production code&#8230;&#8203;</p>
@@ -3570,10 +3411,6 @@ same as for the assertions we saw earlier):</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Integers</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_equal_to_hex(value)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Integers</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_not_equal_to(value)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Integers</p></td>
 </tr>
@@ -3646,7 +3483,9 @@ same as for the assertions we saw earlier):</p>
 <div class="paragraph">
 <p>For the double valued constraints you can set the number of
 significant digits to consider a match with a call to
-<code>significant_figures_for_assert_double_are(int figures)</code>.</p>
+<code>significant_figures_for_assert_double_are(int figures)</code>.
+The <a href="#floating_point_comparison_algorithm">section on how to work with doubles</a> has a more detailed
+discussion of the algorithm used for comparing floating point numbers.</p>
 </div>
 <div class="paragraph">
 <p>Then there are two ways to return results:</p>
@@ -3664,6 +3503,10 @@ significant digits to consider a match with a call to
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>will_return(value)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Return the value from the mock function (which needs to be declared returning that type</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>will_return_double(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ditto for double values (required because of C&#8217;s type coercion rules which would otherwise convert a double into an int)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>will_set_contents_of_parameter(parameter_name, value, size)</code></p></td>
@@ -3701,8 +3544,8 @@ expectation, one for each reference parameter, but naturally only one
 <div class="listingblock">
 <div class="content">
 <pre>Running "formatter" (1 tests)...
-Completed "Formatter": 1 pass, 0 failures, 0 exceptions in 1ms.
-Completed "formatter": 1 pass, 0 failures, 0 exceptions in 1ms.</pre>
+Completed "Formatter": 1 pass in 42ms.
+Completed "formatter": 1 pass in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3730,8 +3573,8 @@ loop.</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running "formatter" (2 tests)...
-Completed "Formatter": 2 passes, 0 failures, 0 exceptions in 1ms.
-Completed "formatter": 2 passes, 0 failures, 0 exceptions in 1ms.</pre>
+Completed "Formatter": 2 passes in 42ms.
+Completed "formatter": 2 passes in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3761,8 +3604,8 @@ we get <code>"a"</code>, <code>"b"</code> and <code>"c"</code> in order.</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running "formatter" (3 tests)...
-Completed "Formatter": 5 passes, 0 failures, 0 exceptions in 2ms.
-Completed "formatter": 5 passes, 0 failures, 0 exceptions in 2ms.</pre>
+Completed "Formatter": 5 passes in 42ms.
+Completed "formatter": 5 passes in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3788,8 +3631,8 @@ correct functions.  This is a more realistic parameter check&#8230;&#8203;</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running "formatter" (4 tests)...
-Completed "Formatter": 9 passes, 0 failures, 0 exceptions in 2ms.
-Completed "formatter": 9 passes, 0 failures, 0 exceptions in 2ms.</pre>
+Completed "Formatter": 9 passes in 42ms.
+Completed "formatter": 9 passes in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3815,8 +3658,8 @@ there is no paragraph.</p>
 formatter_tests.c:59: Failure: Formatter -&gt; ignores_empty_paragraphs
 	Mocked function [writer] has an expectation that it will never be called, but it was
 
-Completed "Formatter": 9 passes, 1 failure, 0 exceptions in 6ms.
-Completed "formatter": 9 passes, 1 failure, 0 exceptions in 6ms.</pre>
+Completed "Formatter": 9 passes, 1 failure in 42ms.
+Completed "formatter": 9 passes, 1 failure in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3844,8 +3687,8 @@ bugs.</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running "formatter" (5 tests)...
-Completed "Formatter": 9 passes, 0 failures, 0 exceptions in 3ms.
-Completed "formatter": 9 passes, 0 failures, 0 exceptions in 3ms.</pre>
+Completed "Formatter": 9 passes in 42ms.
+Completed "formatter": 9 passes in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3853,15 +3696,15 @@ Completed "formatter": 9 passes, 0 failures, 0 exceptions in 3ms.</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mocks_are">4.4. Mocks Are&#8230;&#8203;</h3>
+<h3 id="_mocks_are">3.4. Mocks Are&#8230;&#8203;</h3>
 <div class="paragraph">
-<p>Using mocks is a very handy way to isolate a unit and catch and
-control calls to external units. Depending on your style of coding two
-schools of thinking have emerged. And of course <strong>Cgreen</strong> supports
+<p>Using mocks is a very handy way to isolate a unit by catching and
+controlling calls to external units. Depending on your style of coding
+two schools of thinking have emerged. And of course <strong>Cgreen</strong> supports
 both!</p>
 </div>
 <div class="sect3">
-<h4 id="_strict_or_loose_mocks">4.4.1. Strict or Loose Mocks</h4>
+<h4 id="_strict_or_loose_mocks">3.4.1. Strict or Loose Mocks</h4>
 <div class="paragraph">
 <p>The two schools are thinking a bit differently about what mock
 expectations means. Does it mean that all external calls must be
@@ -3880,7 +3723,7 @@ a unit through all its exact behaviours towards its neighbours.</p>
 </div>
 <div class="paragraph">
 <p>On the other hand, 'loose' mocks are looser. They allow both
-unfullfilled expectations and try to handle unexpected calls in a
+unfulfilled expectations and try to handle unexpected calls in a
 reasonable way.</p>
 </div>
 <div class="paragraph">
@@ -3892,11 +3735,11 @@ in a suite.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_learning_mocks">4.4.2. Learning Mocks</h4>
+<h4 id="_learning_mocks">3.4.2. Learning Mocks</h4>
 <div class="paragraph">
-<p>Working with legacy code and trying to apply TDD, BDD or even simply
-add some unit tests is not easy. You&#8217;re working with unknown code that
-does unknown things with unknown counterparts.</p>
+<p>Working with legacy code and trying to apply TDD, BDD, or even simply
+adding some unit tests, is not easy. You&#8217;re working with unknown code
+that does unknown things with unknown counterparts.</p>
 </div>
 <div class="paragraph">
 <p>So the first step would be to isolate the unit. We won&#8217;t go into
@@ -3980,9 +3823,22 @@ done.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-You still need to implement the mock functions, of
-course. I.e. write functions that calls <code>mock()</code> and replaces the real
-functions.
+Before you can do this you need to implement the mock functions, of
+course. I.e. write functions that replaces the real
+functions and instead calls <code>mock()</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can try the <code>cgreen-mocker</code> for this, as described in
+<a href="#cgreen-mocker"><code>cgreen-mocker</code> - Automated Mocking</a>.
 </td>
 </tr>
 </table>
@@ -3992,7 +3848,307 @@ functions.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_context_subject_under_test_suites">5. Context, Subject Under Test &amp; Suites</h2>
+<h2 id="_special_cases">4. Special Cases</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_working_with_code_doubles_code">4.1. Working with <code>doubles</code></h3>
+<div class="paragraph">
+<p>We are not talking about
+<a href="http://www.hostettler.net/blog/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">test doubles</a>
+here, but about values of C/C++ <code>double</code> type (a.k.a double float.)</p>
+</div>
+<div class="paragraph">
+<p><strong>Cgreen</strong> is designed to make it easy and natural to write assertions
+and expectations. Many functions can be used for multiple data types,
+e.g.  <code>is_equal_to()</code> applies to all integer type values, actually
+including pointers.</p>
+</div>
+<div class="paragraph">
+<p>But the C language has its quirks. One of them is the fact that it is
+impossible to inspect the datatypes of values during run-time. This
+has e.g.  forced the introduction of <code>is_equal_to_string()</code> to enable
+string comparisons.</p>
+</div>
+<div class="sect3">
+<h4 id="_assertions_and_constraints">4.1.1. Assertions and Constraints</h4>
+<div class="paragraph">
+<p>When it comes to double typed values this has spilled over even further. For
+double typed values we have</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Constraint</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_equal_to_double(value)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_not_equal_to_double(value)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_less_than_double(value)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_greater_than_double(value)</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>But there is also the special assert that you must use when asserting doubles</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Assertion</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>assert_that_double(expected, constraint)</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>and the utility function</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Utility</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>significant_figures_for_assert_double_are(int figures)</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>And of course they are designed to go together. So, if you want to assert
+an expression yeilding a <code>double</code> typed value, you need to combine them:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(Doubles, can_assert_double_values) {
+    significant_figures_for_assert_double_are(3);
+    assert_that_double(3.14, is_equal_to_double(5.0));
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You have to use <code>assert_that_double()</code> and <code>is_equal_to_double()</code>
+together.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>and you would get</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>double_tests.c:13: Failure: can_assert_double_values
+	Expected [3.14] to [equal double] [5.0] within [3] significant figures
+		actual value:	3.140000
+		expected value:	5.000000</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="double_mocks">4.1.2. Mocks</h4>
+<div class="paragraph">
+<p>The general mechanism <strong>Cgreen</strong> uses to transport values to and from
+mock functions is based on the simple idea that most types fit into a
+"large" integer and can be type converted to and from whatever type
+you need.</p>
+</div>
+<div class="paragraph">
+<p>Since a <code>double float</code> will not fit into the same memory space as an
+integer <strong>Cgreen</strong> handles that by encapsulating ("boxing") the <code>double</code>
+into an area which is represented by the pointer to it.  And that
+pointer can fit into the integer type value (<code>intptr_t</code>) that <strong>Cgreen</strong>
+uses to transport values into and out of <code>mock()</code>.  To get the value
+back you "unbox" it.</p>
+</div>
+<div class="paragraph">
+<p>There are two possible uses of <code>double</code> that you need to be
+aware of</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>When a parameter to the mocked function is of <code>double</code> type and
+needs to be matched in an constraint in an <code>expect</code> call.</p>
+</li>
+<li>
+<p>When the mock function itself should return a <code>double</code> type value.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>In the test you should use the special <code>double</code> type constraints and
+the <code>will_return_double()</code> convenience function.  In the mock function
+you will have to take care to box and unbox as required.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Boxing and unboxing in mock functions</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Description</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>box_double(double value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wrap the value in an allocated
+                                     memory area and return a pointer
+                                     to it</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>unbox_double(BoxedDouble *box)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unwrap the value by freeing the
+                                     area and returning the value</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Here&#8217;s an example of that:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">static double double_out(int i, double d) {
+    return unbox_double(mock(i, box_double(d))); <i class="conum" data-value="1"></i><b>(1)</b>
+}
+
+Ensure(Doubles, can_be_arguments_to_mock_and_returned) {
+    expect(double_out,
+           when(i, is_equal_to(15)),
+           when(d, is_equal_to_double(31.32)), <i class="conum" data-value="2"></i><b>(2)</b>
+           will_return_double(3.1415926));     <i class="conum" data-value="3"></i><b>(3)</b>
+    assert_that_double(double_out(15, 31.32), is_equal_to_double(3.1415926));
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>We can see that the parameter <code>d</code> to the mock function, since it is a
+<code>double</code>, it will have to be used as <code>box_double(d)</code> in the call to
+<code>mock()</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The corresponding <code>expect()</code> uses a double constraint.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The mock function in this small example also returns a <code>double</code>. The
+<code>expect()</code> uses <code>will_return_double()</code> so the mock function needs to
+unbox the return value from <code>mock()</code> to be able to return the <code>double</code>
+type value.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Strange errors may occur if you box and/or unbox or combine
+<code>double</code> constraints incorrectly.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="floating_point_comparison_algorithm">4.1.3. Details of floating point comparison algorithm</h4>
+<div class="paragraph">
+<p>The number of significant digits set with
+<code>significant_figures_for_assert_double_are()</code> specifies a <em>relative</em>
+tolerance.  Cgreen considers two double precision numbers x and y
+equal if their difference normalized by the larger of the two is
+smaller than 10^(1 - significant_figures)^. Mathematically, we check
+that |x - y| &lt; max(|x|, |y|) * 10^(1 - significant_figures)^.</p>
+</div>
+<div class="paragraph">
+<p>Well documented subtleties arise when comparing floating point numbers
+close to zero using this algorithm. The article
+<a href="https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/">Comparing
+Floating Point Numbers, 2012 Edition</a> by Bruce Dawson has an excellent
+discussion of the issue. The essence of the problem can be appreciated
+if we consider the special case where y == 0. In that case, our
+condition reduces to |x| &lt; |x| * 10^(1 - significant_figures)^.
+After cancelling |x| this simplifies to 1 &lt; 10^(1 -
+significant_figures)^.  But this is only true if significant_figures
+&lt; 1. In words this can be summarized by saying that, in a relative
+sense, <em>all</em> numbers are very different from zero. To circumvent this
+difficulty we recommend to use a constraint of the following form when
+comparing numbers close to zero:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">assert_that(fabs(x - y) &lt; abs_tolerance);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_using_cgreen_with_c">4.2. Using Cgreen with C++</h3>
+<div class="paragraph">
+<p>The examples in this guide uses the C langauge to shows how to use
+<strong>CGreen</strong>. You can also use <strong>CGreen</strong> with C++.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The following needs expansion and more details as the support
+for C++ is extended.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>All you have to do is</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Use the <code>cgreen</code> namespace by adding <code>using namespace cgreen;</code>
+at the beginning of the file with your tests</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>There is also one extra feature when you use C++, the <code>assert_throws</code>
+function.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_context_system_under_test_suites">5. Context, System Under Test &amp; Suites</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>As mentioned earlier, <strong>Cgreen</strong> promotes the behaviour driven
@@ -4010,12 +4166,14 @@ that´ to `ensure that´, makes a huge difference in thinking, and also
 very often in quality of the resulting code.</p>
 </div>
 <div class="sect2">
-<h3 id="_the_sut_subject_under_test">5.1. The SUT - Subject Under Test</h3>
+<h3 id="_the_sut_system_under_test">5.1. The SUT - System Under Test</h3>
 <div class="paragraph">
 <p>Since BDD talks about behaviour, there has to be something that we can
-talk about as having the wanted behaviour. This is usually called the
-SUT, the Subject Under Test. <strong>Cgreen</strong> in BDD-ish mode requires that you
-define a name for it.</p>
+talk about as having that wanted behaviour. This is usually called the
+SUT, the System Under Test. The "system" might be whatever we are testing,
+such as a C module ("MUT"), class ("CUT"), object ("OUT"), function ("FUT")
+or method ("MUT"). We will stick with SUT in this document. To use <strong>Cgreen</strong>
+in BDD-ish mode you must define a name for it.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4093,7 +4251,7 @@ Ensure(shopping_basket_for_returning_customer, allows_use_of_discounts) {
 with the SUT being the shopping basket 'class'.</p>
 </div>
 <div class="paragraph">
-<p>So 'context', 'subject under test' and 'suite' are mostly
+<p>So 'context', 'system under test' and 'suite' are mostly
 interchangable concepts in <strong>Cgreen</strong> lingo. It&#8217;s a named group of
 'tests' that share the same <code>BeforeEach</code> and <code>AfterEach</code> and lives in
 the same source file.</p>
@@ -4102,7 +4260,331 @@ the same source file.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="changing_style">6. Changing Style</h2>
+<h2 id="runner">6. Automatic Test Discovery</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_forgot_to_add_your_test">6.1. Forgot to Add Your Test?</h3>
+<div class="paragraph">
+<p>When we write a new test we focus on the details about the test we are
+trying to write. And writing tests is no trivial matter so this might
+well take a lot of brain power.</p>
+</div>
+<div class="paragraph">
+<p>So, it comes as no big surprise, that sometimes you write your test
+and then forget to add it to the suite. When we run it it appears that it
+passed on the first try! Although this <strong>should</strong> really make you
+suspicious, sometimes you get so happy that you just continue with
+churning out more tests and more code. It&#8217;s not until some (possibly
+looong) time later that you realize, after much headache and
+debugging, that the test did not actually pass. It was never even run!</p>
+</div>
+<div class="paragraph">
+<p>There are practices to minimize the risk of this happening, such as
+always running the test as soon as you can set up the test. This way
+you will see it fail before trying to get it to pass.</p>
+</div>
+<div class="paragraph">
+<p>But it is still a practice, something we, as humans, might fail to do
+at some point. Usually this happens when we are most stressed and in
+need of certainty.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_solution_the_cgreen_runner">6.2. The Solution - the 'cgreen-runner'</h3>
+<div class="paragraph">
+<p><strong>Cgreen</strong> gives you a tool to avoid not only the risk of this
+happening, but also the extra work and extra code. It is called the
+<code>cgreen-runner</code>.</p>
+</div>
+<div class="paragraph">
+<p>The <code>cgreen-runner</code> should come with your <strong>Cgreen</strong> installation if
+your platform supports the technique that is required, which is
+'programatic access to dynamic loading of libraries'. This means
+that a program can load an external library of code into memory and
+inspect it. Kind of self-inspection, or reflexion.</p>
+</div>
+<div class="paragraph">
+<p>So all you have to do is to build a dynamically loadable library of
+all tests (and of course your objects under test and other necessary
+code). Then you can run the <code>cgreen-runner</code> and point it to the
+library. The runner will then load the library, enumerate all tests in
+it, and run every test.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s automatic, and there is nothing to forget.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_using_the_runner">6.3. Using the Runner</h3>
+<div class="paragraph">
+<p>Assuming your tests are in <code>first_test.c</code> the typical command to
+build your library using <code>gcc</code> would be</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ gcc -shared -o first_test.so -fPIC first_test.c -lcgreen</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>-fPIC</code> means to generate 'position independent code' which is
+required if you want to load the library dynamically. To explicitly
+state this is required on many platforms.</p>
+</div>
+<div class="paragraph">
+<p>How to build a dynamically loadable shared library might vary a lot
+depending on your platform. Can&#8217;t really help you there, sorry!</p>
+</div>
+<div class="paragraph">
+<p>As soon as we have linked it we can run the tests using the
+<code>cgreen-runner</code> by just giving it the shared, dynamically loadable,
+object library as an argument:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ cgreen-runner first_test.so
+Running "first_tests" (2 tests)...
+first_tests.c:12: Failure: Cgreen -&gt; fails_this_test
+	Expected [0 == 1] to [be true]
+
+Completed "Cgreen": 1 pass, 1 failure in 42ms.
+Completed "first_tests": 1 pass, 1 failure in 42ms.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>More or less exactly the same output as when we ran our first test in
+the beginning of this quickstart tutorial. We can see that the top
+level of the tests will be named as the library it was discovered in,
+and the second level is the context for our System Under Test, in
+this case 'Cgreen'. We also see that the context is mentioned in the
+failure message, giving a fairly obvious <code>Cgreen &#8594; fails_this_test</code>.</p>
+</div>
+<div class="paragraph">
+<p>Now we can actually delete the main function in our source code. We
+don&#8217;t need all this, since the runner will discover all tests
+automatically.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">int main(int argc, char **argv) {
+    TestSuite *suite = create_test_suite();
+    add_test_with_context(suite, Cgreen, passes_this_test);
+    add_test_with_context(suite, Cgreen, fails_this_test);
+    return run_test_suite(suite, create_text_reporter());
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It always feel good to delete code, right?</p>
+</div>
+<div class="paragraph">
+<p>We can also select which test to run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ cgreen-runner first_test.so Cgreen:this_test_should_fail
+Running "first_tests" (1 tests)...
+first_tests.c:12: Failure: Cgreen -&gt; fails_this_test
+	Expected [0 == 1] to [be true]
+
+Completed "Cgreen": 1 failure in 42ms.
+Completed "first_tests": 1 failure in 42ms.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We recommend the BDD notation to discover tests, and you indicate
+which context the test we want to run is in. In this example it is
+<code>Cgreen</code> so the test should be refered to as <code>Cgreen:this_test_should_fail</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you don&#8217;t use the BDD notation there is actually a context anyway,
+it is called <code>default</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="runner-options">6.4. Cgreen Runner Options</h3>
+<div class="paragraph">
+<p>Once you get the build set up right for the cgreen-runner everything
+is fairly straight-forward. But you have a few options:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">--xml &lt;prefix&gt;</dt>
+<dd>
+<p>Instead of messages on stdout with the TextReporter,
+write results into one XML-file per suite or context,
+compatible with Hudson/Jenkins CI. The filename(s)
+will be <code>&lt;prefix&gt;-&lt;suite&gt;.xml</code></p>
+</dd>
+<dt class="hdlist1">--suite &lt;name&gt;</dt>
+<dd>
+<p>Name the top level suite</p>
+</dd>
+<dt class="hdlist1">--no-run</dt>
+<dd>
+<p>Don&#8217;t run the tests</p>
+</dd>
+<dt class="hdlist1">--verbose</dt>
+<dd>
+<p>Show progress information and list discovered tests</p>
+</dd>
+<dt class="hdlist1">--colours</dt>
+<dd>
+<p>Use colours (or colors) to emphasis result (requires ANSI-capable terminal)</p>
+</dd>
+<dt class="hdlist1">--quiet</dt>
+<dd>
+<p>Be more quiet</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>The <code>verbose</code> option is particularly handy since it will give you the
+actual names of all tests discovered. So if you have long test names
+you can avoid mistyping them by copying and pasting from the output of
+<code>cgreen-runner --verbose</code>. It will also give the mangled name of the
+test which should make it easier to find in the debugger. Here&#8217;s an
+example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Discovered Cgreen:fails_this_test (Cgreen__fails_this_test)
+Discovered Cgreen:passes_this_test (Cgreen__passes_this_test)
+Discovered 2 test(s)
+Opening [first_tests.so] to only run one test: 'Cgreen:fails_this_test' ...
+Running "first_tests" (1 tests)...
+first_tests.c:12: Failure: Cgreen -&gt; fails_this_test
+	Expected [0 == 1] to [be true]
+
+Completed "Cgreen": 1 failure in 42ms.
+Completed "first_tests": 1 failure in 42ms.</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_selecting_tests_to_run">6.5. Selecting Tests To Run</h3>
+<div class="paragraph">
+<p>You can name a single test to be run by giving it as the last argument
+on the command line. The name should be in the format
+<code>&lt;SUT&gt;:&lt;test&gt;</code>. If not obvious you can get that name by using the
+<code>--verbose</code> command option which will show you all tests discovered
+and both there C/C++ and Cgreen names. Copying the Cgreen name from
+that output is an easy way to run only that particular test. When a
+single test is named it is run using <code>run_single_test()</code>. As described
+in <a href="#tdd_with_cgreen">Five Minutes Doing TDD with Cgreen</a> this means that it is <em>not</em> protected by
+<code>fork()</code>-ing it to run in its own process.</p>
+</div>
+<div class="paragraph">
+<p>The <code>cgreen-runner</code> supports selecting tests with limited pattern
+matching. Using an asterisk as a simple 'match many' symbol you can
+say things like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ cgreen-runner &lt;library&gt; Cgreen:*
+$ cgreen-runner &lt;library&gt; C*:*this*</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_multiple_test_libraries">6.6. Multiple Test Libraries</h3>
+<div class="paragraph">
+<p>You can run tests in multiple libraries in one go by adding them
+to the <code>cgreen-runner</code> command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ cgreen-runner first_set.so second_set.so ...</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_setup_teardown_and_custom_reporters">6.7. Setup, Teardown and Custom Reporters</h3>
+<div class="paragraph">
+<p>The <code>cgreen-runner</code> will only run setup and teardown functions if you
+use the BDD-ish style with <code>BeforeEach()</code> and <code>AfterEach()</code> as
+described above. The runner does not pickup <code>setup()</code> and <code>teardown()</code>
+added to suites, because it actually doesn&#8217;t run suites. It discovers
+all tests and runs them one by one. The macros required by the BDD-ish
+style ensures that the corresponding <code>BeforeEach()</code> and <code>AfterEach()</code>
+are run before and after each test.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+The <code>cgreen-runner</code> <em>will</em> discover your tests in a shared
+library even if you don&#8217;t use the BDD-ish style. But it will not be
+able to find and run the <code>setup()</code> and/or <code>teardown()</code> attached to your
+suite(s). This will probably cause your tests to fail or crash.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In case you have non-BDD style tests <em>without</em> any <code>setup()</code> and/or
+<code>teardown()</code> you can still use the runner. The default suite/context
+where the tests live in this case is called <code>default</code>. But why don&#8217;t
+you convert your tests to BDD notation? This removes the risk of
+frustrating trouble-shooting when you added <code>setup()</code>
+and <code>teardown()</code> and can&#8217;t understand why they are not run&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>So, the runner encourages you to use the BDD notation. But since we
+recommend that you do anyway, that&#8217;s no extra problem if you are
+starting out from scratch. But see <a href="#changing_style">Changing Style</a> for some easy
+tips on how to get you there if you already have non-BDD
+tests.</p>
+</div>
+<div class="paragraph">
+<p>You can choose between the TextReporter, which we have been seeing so
+far, and the built-in JUnit/Ant compatible XML-reporter using the
+<code>--xml</code> option. But it is not currently possible to use custom
+reporters as outlined in <a href="#reporter">Changing Cgreen Reporting</a> with the runner.</p>
+</div>
+<div class="paragraph">
+<p>If you require another custom reporter you need to resort to the
+standard, programatic, way of invoking your tests. For now&#8230;&#8203;</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="xensure">6.8. Skipping Tests</h3>
+<div class="paragraph">
+<p>Sometimes you find that you need to temporarily remove a test, perhaps
+to do a refactoring when you have a failing test. Ignoring that test will
+allow you to do the refactoring while still in the green.</p>
+</div>
+<div class="paragraph">
+<p>An old practice is then to comment it out. That is a slightly cumbersome.
+It is also hazardous habit as there is no indication of a missing test if you
+forget to uncomment it when you are done.</p>
+</div>
+<div class="paragraph">
+<p><strong>Cgreen</strong> offers a much better solution. You can just add an 'x' infront
+of the <code>Ensure</code> for the test and that test will be skipped.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-C" data-lang="C">...
+xEnsure(Reader, ...) {
+  ...
+}
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this method, it is a one character change to temporarily ignore,
+and un-ignore, a test. It is also easily found using text searches through
+a complete source tree. <strong>Cgreen</strong> will also tally the skipped tests, so
+it is clearly visible that you have some skipped test when you run them.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="changing_style">7. Changing Style</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>If you already have some TDD style <strong>Cgreen</strong> test suites, it is quite
@@ -4155,10 +4637,10 @@ automatic discovery of tests as described in <a href="#runner">Automatic Test Di
 </div>
 </div>
 <div class="sect1">
-<h2 id="reporter">7. Changing Cgreen Reporting</h2>
+<h2 id="reporter">8. Changing Cgreen Reporting</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_replacing_the_reporter">7.1. Replacing the Reporter</h3>
+<h3 id="_replacing_the_reporter">8.1. Replacing the Reporter</h3>
 <div class="paragraph">
 <p>In every test suite so far, we have run the tests with this line&#8230;&#8203;</p>
 </div>
@@ -4169,7 +4651,100 @@ automatic discovery of tests as described in <a href="#runner">Automatic Test Di
 </div>
 <div class="paragraph">
 <p>We can change the reporting mechanism just by changing this
-method.</p>
+call to create another reporter.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="builtin_reporters">8.2. Built-in Reporters</h3>
+<div class="paragraph">
+<p><strong>Cgreen</strong> has the following built-in reporters that you can choose from
+when your code runs the test suite.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Reporter</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
+<th class="tableblock halign-left valign-top">Signature</th>
+<th class="tableblock halign-left valign-top">Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Text</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Human readable, with clear messages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>create_text_reporter(void)</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">XML</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANT/Jenkins compatible</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>create_xml_reporter(const char *file_prefix)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>file_prefix</code> is the prefix of the XML files generated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CUTE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CUTE Eclipse-plugin (<a href="http://cute-test.org" class="bare">http://cute-test.org</a>) compatible output</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>create_cute_reporter(void)</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CDash</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CMake (<a href="http://cmake.org" class="bare">http://cmake.org</a>) dashboard</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>create_cdash_reporter(CDashInfo *info)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>info</code> is a structure defined in <code>cdash_reporter.h</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>If you write a runner function like in most examples above, you can just substitute which runner to create. If you use the <code>cgreen-runner</code> (<a href="#runner">Automatic Test Discovery</a>) to dynamically find all your tests you can force it to use the XML-reporter with the <code>-x &lt;prefix&gt;</code> option.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Currently <code>cgreen-runner</code> does only support the XML built-in reporter.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rolling_our_own">8.3. Rolling Our Own</h3>
+<div class="paragraph">
+<p>Althoug <strong>Cgreen</strong> has a number of options, there are times when you&#8217;d like
+a different output from the reporter, the CUTE and CDash  reporters are
+examples that grew out of such a need.</p>
+</div>
+<div class="paragraph">
+<p>Perhaps your Continuous Integration server want the result in a different
+format, or you just don&#8217;t like the text reporter&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Writing your own reporter is supported. And we&#8217;ll go through how that can
+be done using an XML-reporter as an example.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<strong>Cgreen</strong> already has an XML-reporter compatible with ANT/Jenkins, see
+<a href="#builtin_reporters">Built-in Reporters</a>.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>Here is the code for <code>create_text_reporter()</code>&#8230;&#8203;</p>
@@ -4184,6 +4759,7 @@ method.</p>
     reporter-&gt;start_suite = &amp;text_reporter_start_suite;
     reporter-&gt;start_test = &amp;text_reporter_start_test;
     reporter-&gt;show_fail = &amp;show_fail;
+    reporter-&gt;show_skip = &amp;show_skip;
     reporter-&gt;show_incomplete = &amp;show_incomplete;
     reporter-&gt;finish_test = &amp;text_reporter_finish_test;
     reporter-&gt;finish_suite = &amp;text_reporter_finish;
@@ -4213,7 +4789,7 @@ about the methods in the <code>TestReporter</code> structure.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_testreporter_structure">7.2. The TestReporter Structure</h3>
+<h3 id="_the_testreporter_structure">8.4. The TestReporter Structure</h3>
 <div class="paragraph">
 <p>The <strong>Cgreen</strong> <code>TestReporter</code> is a pseudo class that looks
 something like&#8230;&#8203;</p>
@@ -4227,6 +4803,7 @@ struct _TestReporter {
     void (*start_test)(TestReporter *reporter, const char *name);
     void (*show_pass)(TestReporter *reporter, const char *file, int line,
                                    const char *message, va_list arguments);
+    void (*show_skip)(TestReporter *reporter, const char *file, int line);
     void (*show_fail)(TestReporter *reporter, const char *file, int line,
                                    const char *message, va_list arguments);
     void (*show_incomplete)(TestReporter *reporter, const char *file, int line,
@@ -4264,7 +4841,7 @@ the name of the suite being entered and the number of tests in that
 suite. The default version keeps track of the stack of tests in the
 <code>breadcrumb</code> pointer of <code>TestReporter</code>. If you make use of the
 breadcrumb functions, as the defaults do, then you will need to call
-<code>reporter_start_suite()</code> to keep the book keeping in sync.</p>
+<code>reporter_start_suite()</code> to keep the book-keeping in sync.</p>
 </dd>
 <dt class="hdlist1"><code>void (*start_test)(TestReporter *reporter, const char *name)</code></dt>
 <dd>
@@ -4273,15 +4850,15 @@ reporter with the name of the test being entered. Again, the default
 version keeps track of the stack of tests in the <code>breadcrumb</code> pointer
 of <code>TestReporter</code>. If you make use of the breadcrumb functions, as the
 defaults do, then you will need to call <code>reporter_start_test()</code> to keep the
-book keeping in sync.</p>
+book-keeping in sync.</p>
 </dd>
 <dt class="hdlist1"><code>void (*show_pass)(TestReporter *reporter, const char *file, int line, const char *message, va_list arguments)</code></dt>
 <dd>
-<p>This method is initially empty as there most reporters see little
-point in reporting passing tests (but you might do), so there is no
-need to chain the call to any other function. Besides the pointer to
-the reporter structure, <strong>Cgreen</strong> also passes the file name of the
-test, the line number of failed assertion, the message to show and any
+<p>This method is initially empty as most reporters see little point in
+reporting passing tests (but you might do), so there is no need to
+chain the call to any other function. Besides the pointer to the
+reporter structure, <strong>Cgreen</strong> also passes the file name of the test,
+the line number of failed assertion, the message to show and any
 additional parameters to substitute into the message. The message
 comes in as <code>printf()</code> style format string, and so the variable
 argument list should match the substitutions.</p>
@@ -4290,12 +4867,16 @@ argument list should match the substitutions.</p>
 <dd>
 <p>The partner of <code>show_pass()</code>, and the one you&#8217;ll likely overload first.</p>
 </dd>
+<dt class="hdlist1"><code>void (*show_skip)(TestReporter *reporter, const char *file, int line)</code></dt>
+<dd>
+<p>This method will be called when a skipped test is encountered, see <a href="#xensure">Skipping Tests</a>.</p>
+</dd>
 <dt class="hdlist1"><code>void (*show_incomplete)(TestReporter *reporter, const char *file, int line, const char *message, va_list arguments)</code></dt>
 <dd>
-<p>When a test fails to complete, this is the handler that is called. As it&#8217;s an unexpected
-outcome, no message is received, but we do get the name of the
-test. The text reporter combines this with the breadcrumb to produce
-the exception report.</p>
+<p>When a test fails to complete, this is the handler that is called. As
+it&#8217;s an unexpected outcome, no message is received, but we do get the
+name of the test. The text reporter combines this with the breadcrumb
+to produce the exception report.</p>
 </dd>
 <dt class="hdlist1"><code>void (*assert_true)(TestReporter *reporter, const char *file, int line, int result, const char * message, &#8230;&#8203;)</code></dt>
 <dd>
@@ -4320,6 +4901,25 @@ familiar summary of passes and fails.</p>
 </dd>
 </dl>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The <code>show_fail()</code> and <code>show_pass()</code> functions are called from
+the child process, i.e. the isolated process that is <code>fork()</code>:ed to
+run a single test case. All others, notably <code>start_&#8230;&#8203;()</code>,
+<code>finish_&#8230;&#8203;()</code>, <code>show_incomplete()</code> and <code>show_skip()</code> are run in the
+main (parent) process. This fact might be important since the
+processes do not share memory. Information is passed from the child to
+the parent using messaging performed within the <code>show_&#8230;&#8203;()</code>
+functions.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>The second block is simply resources and book keeping that the reporter
 can use to liven up the messages&#8230;&#8203;</p>
@@ -4332,6 +4932,14 @@ can use to liven up the messages&#8230;&#8203;</p>
 </td>
 <td class="hdlist2">
 <p>The number of passes so far.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>skips</code>
+</td>
+<td class="hdlist2">
+<p>The number of tests that has been skipped by the <code>xEnsure</code> mechanism (see <a href="#xensure">Skipping Tests</a>)</p>
 </td>
 </tr>
 <tr>
@@ -4433,7 +5041,7 @@ use of colors when printing passes and failures. You set it with
 </div>
 </div>
 <div class="sect2">
-<h3 id="_an_example_xml_reporter">7.3. An Example XML Reporter</h3>
+<h3 id="_an_example_xml_reporter">8.5. An Example XML Reporter</h3>
 <div class="paragraph">
 <p>Let&#8217;s make things real with an example.  Suppose we want to send the
 output from <strong>Cgreen</strong> in XML format, say for storing in a repository or
@@ -4447,7 +5055,8 @@ for sending across the network.</p>
 </td>
 <td class="content">
 The <code>cgreen-runner</code> already has an XML-reporter that you can
-use. See <a href="#runner-options">Cgreen Runner Options</a>.
+use if you need to produce Jenkins/ANT compatible XML output.
+See <a href="#runner-options">Cgreen Runner Options</a>.
 </td>
 </tr>
 </table>
@@ -4526,8 +5135,8 @@ working. So far it is.</p>
 test_as_xml.c:12: Failure: A Group -&gt; reports_a_test_that_fails
 	A failure
 
-Completed "A Group": 1 pass, 1 failure, 0 exceptions in 1ms.
-Completed "Top Level": 1 pass, 1 failure, 0 exceptions in 1ms.</pre>
+Completed "A Group": 1 pass, 1 failure in 42ms.
+Completed "Top Level": 1 pass, 1 failure in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -4871,7 +5480,7 @@ return a boolean for monitoring purposes.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_hints_and_tips">8. Hints and Tips</h2>
+<h2 id="_hints_and_tips">9. Hints and Tips</h2>
 <div class="sectionbody">
 <div class="admonitionblock caution">
 <table>
@@ -4880,18 +5489,96 @@ return a boolean for monitoring purposes.</p>
 <i class="fa icon-caution" title="Caution"></i>
 </td>
 <td class="content">
-This chapter is in its infancy. It will contain tips for
-situations that you need some help with.
+This chapter is intended to contain tips for
+situations that you need some help with, but it is nowhere near complete
+at this time.
 </td>
 </tr>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_compiler_error_messages">8.1. Compiler Error Messages</h3>
+<h3 id="cgreen-mocker">9.1. <code>cgreen-mocker</code> - Automated Mocking</h3>
 <div class="paragraph">
-<p>Sometimes you can get cryptic and strange error messages from the
+<p>Are you starting out with <strong>Cgreen</strong> on a largish legacy system? And there
+are loads and loads of functions to mock to get a unit under test?</p>
+</div>
+<div class="paragraph">
+<p>You could try the <code>cgreen-mocker</code> that is supplied as a contributed
+part of the <strong>Cgreen</strong> source distribution.</p>
+</div>
+<div class="paragraph">
+<p>It is a Python program that parses C language header files and tries
+to create a corresponding <code>.mock</code> file where each function declaration
+is replaced with a call to <code>mock()</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Usage:
+  cgreen-mocker.py &lt;headerfile&gt; { &lt;cpp_directive&gt; }
+     &lt;headerfile&gt;: file with function declarations that you want
+                   to mock
+     &lt;cpp_directive&gt;: any 'cpp' directive but most useful is e.g.
+                      "-I &lt;directory&gt;" to ensure cpp finds files.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So give a header file containg lines like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">extern CgreenValue make_cgreen_integer_value(intptr_t integer);
+extern CgreenValue make_cgreen_string_value(const char *string);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>cgreen-mocker</code> will, give that there are no errors, print something
+like this on the screen:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">CgreenValue make_cgreen_integer_value(intptr_t integer) {
+  return mock(integer);
+}
+
+CgreenValue make_cgreen_string_value(const char *string) {
+  return mock(string);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To use <code>cgreen-mocker</code> you need Python and <code>pycparser</code>. The latter
+can be found at [<a href="https://github.com/eliben/pycparser" class="bare">https://github.com/eliben/pycparser</a>] or can easily
+be installed with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ pip install pycparser</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>cgreen-mocker</code> is an unsupported contribution to the <strong>Cgreen</strong>
+project by Thomas Nilefalk.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_compiler_error_messages">9.2. Compiler Error Messages</h3>
+<div class="paragraph">
+<p>Sometimes you might get cryptic and strange error messages from the
 compiler. Since <strong>Cgreen</strong> uses some C/C++ macro magic this can happen
 and the error messages might not be straight forward to interpret.</p>
+</div>
+<div class="paragraph">
+<p>Here are some examples, but the exact messages differ between compilers
+and versions.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
@@ -4905,21 +5592,25 @@ and the error messages might not be straight forward to interpret.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>"contextFor&lt;X&gt;" is undeclared here</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">You forgot the <code>BeforeEach()</code> function</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Missing <code>Describe(&lt;X&gt;);</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>undefined reference to 'AfterEach_For_&lt;X&gt;'</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">You forgot the <code>AfterEach()</code> function</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Missing <code>AfterEach(&lt;X&gt;)</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>CgreenSpec<em>&lt;X&gt;</em>&lt;Y&gt;__ is undeclared</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">You forgot to specify the test subject/context in the <code>Ensure</code> of a BDD style test</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Missing test subject/context in the <code>Ensure</code> of a BDD style test</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>use of undeclared identifier 'contextFor&lt;X&gt;'</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Missing <code>Describe(&lt;X&gt;);</code></p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_signed_unsigned_hex_and_byte">8.2. Signed, Unsigned, Hex and Byte</h3>
+<h3 id="_signed_unsigned_hex_and_byte">9.3. Signed, Unsigned, Hex and Byte</h3>
 <div class="paragraph">
 <p><strong>Cgreen</strong> attempts to handle primitive type comparisons with a single
 constraint, <code>is_equal_to()</code>. This means that it must store the actual
@@ -4998,7 +5689,7 @@ expected values in hex. This can easily be done with the
 </div>
 </div>
 <div class="sect2">
-<h3 id="_cgreen_and_coverage">8.3. Cgreen and Coverage</h3>
+<h3 id="_cgreen_and_coverage">9.4. Cgreen and Coverage</h3>
 <div class="paragraph">
 <p><strong>Cgreen</strong> is compatible with coverage tools, in particular
 <code>gcov</code>/<code>lcov</code>. So generating coverage data for your application should
@@ -5028,7 +5719,7 @@ be straight forward.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_garbled_output">8.4. Garbled Output</h3>
+<h3 id="_garbled_output">9.5. Garbled Output</h3>
 <div class="paragraph">
 <p>If the output from your <strong>Cgreen</strong> based tests appear garbled or
 duplicated, this can be caused by the way <strong>Cgreen</strong> terminates its
@@ -5085,8 +5776,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.0.0beta6<br>
-Last updated 2016-05-08 12:09:33 CEST
+Version 1.1.0beta<br>
+Last updated 2018-03-23 15:03:53 CET
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
