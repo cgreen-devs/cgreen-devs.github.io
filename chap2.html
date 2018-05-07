@@ -434,13 +434,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_cgreen_quickstart_guide">1. Cgreen Quickstart Guide</a>
+<li><a href="index.html#_cgreen_quickstart_guide">1. Cgreen Quickstart Guide</a>
 <ul class="sectlevel2">
-<li><a href="#_what_is_cgreen">1.1. What is Cgreen?</a></li>
-<li><a href="#_cgreen_vanilla_or_chocolate">1.2. Cgreen - Vanilla or Chocolate?</a></li>
-<li><a href="#_installing_cgreen">1.3. Installing Cgreen</a></li>
-<li><a href="#tdd_with_cgreen">1.4. Five Minutes Doing TDD with Cgreen</a></li>
-<li><a href="#_what_are_mock_functions">1.5. What are Mock Functions?</a></li>
+<li><a href="index.html#_what_is_cgreen">1.1. What is Cgreen?</a></li>
+<li><a href="index.html#_cgreen_vanilla_or_chocolate">1.2. Cgreen - Vanilla or Chocolate?</a></li>
+<li><a href="index.html#_installing_cgreen">1.3. Installing Cgreen</a></li>
+<li><a href="index.html#tdd_with_cgreen">1.4. Five Minutes Doing TDD with Cgreen</a></li>
+<li><a href="index.html#_what_are_mock_functions">1.5. What are Mock Functions?</a></li>
 </ul>
 </li>
 <li><a href="chap1.html#_building_cgreen_test_suites">2. Building Cgreen test suites</a>
@@ -457,12 +457,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="chap1.html#_building_composite_test_suites">2.10. Building Composite Test Suites</a></li>
 </ul>
 </li>
-<li><a href="chap2.html#_mocking_functions_with_cgreen">3. Mocking functions with Cgreen</a>
+<li><a href="#_mocking_functions_with_cgreen">3. Mocking functions with Cgreen</a>
 <ul class="sectlevel2">
-<li><a href="chap2.html#_the_problem_with_streams">3.1. The Problem with Streams</a></li>
-<li><a href="chap2.html#_record_and_playback">3.2. Record and Playback</a></li>
-<li><a href="chap2.html#_setting_expectations_on_mock_functions">3.3. Setting Expectations on Mock Functions</a></li>
-<li><a href="chap2.html#_mocks_are">3.4. Mocks Are…​</a></li>
+<li><a href="#_the_problem_with_streams">3.1. The Problem with Streams</a></li>
+<li><a href="#_record_and_playback">3.2. Record and Playback</a></li>
+<li><a href="#_setting_expectations_on_mock_functions">3.3. Setting Expectations on Mock Functions</a></li>
+<li><a href="#_mocks_are">3.4. Mocks Are…​</a></li>
 </ul>
 </li>
 <li><a href="chap3.html#_special_cases">4. Special Cases</a>
@@ -513,896 +513,1066 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content"><div class="sect1">
-<h2 id="_cgreen_quickstart_guide">1. Cgreen Quickstart Guide</h2>
+<h2 id="_mocking_functions_with_cgreen">3. Mocking functions with Cgreen</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_what_is_cgreen">1.1. What is Cgreen?</h3>
 <div class="paragraph">
-<p><strong>Cgreen</strong> is a unit tester for the C and C++ software developer, a test
-automation and software quality assurance tool for programmers and
-development teams. The tool is completely open source published under
-the <a href="https://github.com/cgreen-devs/cgreen/blob/master/LICENSE">ISC,
-OpenBSD, license</a>.</p>
+<p>When testing you want certainty above all else.  Random events destroy
+confidence in your test suite and force needless extra runs &quot;to be
+sure&quot;.  A good test places the system under test into a tightly
+controlled environment.  A test chamber if you like.  This makes the
+tests fast, repeatable and reliable.</p>
 </div>
 <div class="paragraph">
-<p>Unit testing is a development practice popularised by the agile
-development community.  It is characterised by writing many small
-tests alongside the normal code. Often the tests are written before
-the code they are testing, in a tight test-code-refactor loop.  Done
-this way, the practice is known as Test Driven Development. <strong>Cgreen</strong>
-was designed specifically to support this style of development.</p>
+<p>To create a test chamber for testing code, we have to control any
+outgoing calls from the code under test.  We won’t believe our test
+failure if our code is making calls to the internet for example.  The
+internet can fail all by itself.  Not only do we not have total
+control, but it also means we have to get dependent components working
+before we can test the higher level code.  This makes it difficult to
+code top down.</p>
 </div>
 <div class="paragraph">
-<p>Unit tests are written in the same language as the code, in our case
-C or C++. This avoids the mental overhead of constantly switching language,
-and also allows you to use any application code in your tests.</p>
+<p>The solution to this dilemma is to write stub code for the components
+whilst the higher level code is written.  This pollutes the code base
+with temporary code, and the test isolation disappears when the system
+is eventually fleshed out.</p>
 </div>
 <div class="paragraph">
-<p>Here are some of its features:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Fluent API resulting in very readable tests</p>
-</li>
-<li>
-<p>Expressive and clear output using the default reporter</p>
-</li>
-<li>
-<p>Fully functional mocks, both strict and loose</p>
-</li>
-<li>
-<p>Each test runs in its own process for test suite robustness</p>
-</li>
-<li>
-<p>Automatic discovery and running of tests using dynamic library inspection</p>
-</li>
-<li>
-<p>Extensive and expressive constraints for many datatypes</p>
-</li>
-<li>
-<p>BDD-flavoured test declarations with Before and After declarations</p>
-</li>
-<li>
-<p>Extensible reporting mechanism</p>
-</li>
-<li>
-<p>Fully composable test suites</p>
-</li>
-<li>
-<p>A single test can be run in a single process for easier debugging</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p><strong>Cgreen</strong> also supports the classic xUnit-style assertions for easy
-porting from other frameworks.</p>
-</div>
-<div class="paragraph">
-<p><strong>Cgreen</strong> was initially developed to support C programming, but there
-is also some support for C++. It was initially a spinoff from a
-research project at Wordtracker and created by Marcus Baker. Significant
-additions by Matt Hargett and continuous nurturing by Thomas Nilefalk has
-made <strong>Cgreen</strong> what it is today.</p>
-</div>
+<p>The ideal is to have minimal stubs written for each individual test.
+<strong>Cgreen</strong> encourages this approach by making such tests easier to write.</p>
 </div>
 <div class="sect2">
-<h3 id="_cgreen_vanilla_or_chocolate">1.2. Cgreen - Vanilla or Chocolate?</h3>
+<h3 id="_the_problem_with_streams">3.1. The Problem with Streams</h3>
 <div class="paragraph">
-<p>Test driven development (TDD) really catched on when the JUnit
-framework for Java spread to other langauges, giving us a family of
-<a href="https://en.wikipedia.org/wiki/XUnit">xUnit</a> tools. <strong>Cgreen</strong> was born in
-this wave and have many similarities to the xUnit family.</p>
-</div>
-<div class="paragraph">
-<p>But TDD evolved over time and modern thinking and practice is more
-along the lines of BDD, an acronym for Behaviour Driven Development,
-made popular by people like Dan North and frameworks like JBehave,
-RSpec, Cucumber and Jasmine.</p>
-</div>
-<div class="paragraph">
-<p><strong>Cgreen</strong> follows this trend and has evolved to embrace a BDD-flavoured
-style of testing. Although the fundamental mechanisms in TDD and
-'technical' BDD are much the same, the shift in focus by changing
-wording from 'tests' to 'behaviour specifications' is very
-significant.</p>
-</div>
-<div class="paragraph">
-<p>This document will present <strong>Cgreen</strong> using the more modern and better
-BDD-style. In a later section you can have a peek at the classic TDD
-API.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_installing_cgreen">1.3. Installing Cgreen</h3>
-<div class="paragraph">
-<p>There are two ways to install <strong>Cgreen</strong> in your system.</p>
-</div>
-<div class="sect3">
-<h4 id="_installing_a_package">1.3.1. Installing a package</h4>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-At this point there are few supported pre-built packages
-available. For now you’ll probably have to build from source.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>The first way is to use packages provided by the <strong>Cgreen</strong> Team. If
-your system uses a package manager ('apt' or 'port' and so on) there
-might be a prebuilt package that you can just install using your
-systems package manager.</p>
-</div>
-<div class="paragraph">
-<p>If no <strong>Cgreen</strong> package is distributed for your system you can download
-a package from <a href="https://github.com/cgreen-devs/cgreen/releases">Cgreen
-GitHub project</a>. Install it using the normal procedures for your
-system.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_installing_from_source">1.3.2. Installing from source</h4>
-<div class="paragraph">
-<p>The second way is available for developers and advanced
-users. Basically this consists of fetching the sources of the project
-on <a href="https://github.com/cgreen-devs/cgreen">GitHub</a>, just click on
-&quot;Download ZIP&quot;, and compiling them. To do this you need the
-<a href="http://www.cmake.org">CMake</a> build system.</p>
-</div>
-<div class="paragraph">
-<p>Once you have the CMake tool installed, the steps are:</p>
+<p>How would we test the following code…​?</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ unzip cgreen-master.zip
-$ cd cgreen-master
-$ make
-$ make test
-$ make install</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The initial <code>make</code> command will configure the build process and
-create a separate <code>build</code> directory before going there and building
-using <strong>CMake</strong>. This is called an 'out of source build'. It compiles
-<strong>Cgreen</strong> from outside the sources directory. This helps the overall
-file organization and enables multi-target builds from the same
-sources by leaving the complete source tree untouched.</p>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-Experienced users may tweak the build configuration by going to
-the build subdirectory and use <code>ccmake ..</code> to modify the build
-configuration in that subtree.
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-The Makefile is just there for convenience, it just creates the
-build directory and invokes <strong>CMake</strong> there, so that you don’t have
-to. This means that experienced <strong>CMake</strong> users can just do as they
-normally do with a <strong>CMake</strong>-based project instead of invoking <code>make</code>.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>The build process will create a library (on unix called
-<code>libcgreen.so</code>) which can be used in conjunction with the <code>cgreen.h</code>
-header file to compile and link your test code. The created library is
-installed in the system, by default in the <code>/usr/local/lib/</code>.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_your_first_test">1.3.3. Your First Test</h4>
-<div class="paragraph">
-<p>We will start demonstrating the use of <strong>Cgreen</strong> by writing some tests for <strong>Cgreen</strong> itself
-to confirm that everything is working as it should. Let’s start with a
-simple test module with no tests, called <code>first_test.c</code>…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">#include &lt;cgreen/cgreen.h&gt;
-
-Describe(Cgreen);
-BeforeEach(Cgreen) {}
-AfterEach(Cgreen) {}
-
-int main(int argc, char **argv) {
-    TestSuite *suite = create_test_suite();
-    return run_test_suite(suite, create_text_reporter());
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">char *read_paragraph(int (*read)(void *), void *stream) {
+    int buffer_size = 0, length = 0;
+    char *buffer = NULL;
+    int ch;
+    while ((ch = (*read)(stream)) != EOF) {
+        if (++length &gt; buffer_size) {
+            buffer_size += 100;
+            buffer = (char *)realloc(buffer, buffer_size + 1);
+        }
+        if ((buffer[length] = ch) == '\n') {
+            break;
+        }
+        buffer[length + 1] = '\0';
+    }
+    return buffer;
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This is very unexciting. It just creates an empty test suite and runs
-it.  It’s usually easier to proceed in small steps, and this is the
-smallest one I could think of. The only complication is the <code>cgreen.h</code>
-header file and the mysterious looking &quot;declarations&quot; at the beginning
-of the file.</p>
+<p>This is a fairly generic stream filter that turns the incoming
+characters into C string paragraphs. Each call creates one paragraph,
+returning a pointer to it or returning <code>NULL</code> if there is no
+paragraph. The paragraph has memory allocated to it and the stream is
+advanced ready for the next call. That’s quite a bit of functionality,
+and there are plenty of nasty boundary conditions. I really want this
+code tested before I deploy it.</p>
 </div>
 <div class="paragraph">
-<p>The BDD flavoured <strong>Cgreen</strong> notation calls for a System Under Test
-(SUT), or a 'context'. The declarations give a context to the tests
-and it also makes it more natural to talk about which module or class,
-the system under test, is actually responsible for the functionality
-we are expressing. In one way we are 'describing', or spec’ing, the
-functionality of the SUT. That’s what the <code>Describe();</code> does. And for
-technical reasons (actually requirements of the C language), you must
-declare the <code>BeforeEach()</code> and <code>AfterEach()</code> functions even if they
-are empty. (You will get strange errors if you don’t!)</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-We are using the name &quot;Cgreen&quot; as the SUT in these first
-examples, as <strong>Cgreen</strong> itself is the object or class we want to
-test or describe.
-</td>
-</tr>
-</table>
+<p>The problem is the stream dependency. We could use a real stream, but
+that will cause all sorts of headaches. It makes the test of our
+paragraph formatter dependent on a working stream.  It means we have
+to write the stream first, bottom up coding rather than top down.  It
+means we will have to simulate stream failures - not easy.  It will
+also mean setting up external resources. This is more work, will run
+slower, and could lead to spurious test failures.</p>
 </div>
 <div class="paragraph">
-<p>I am assuming you have the <strong>Cgreen</strong> folder in the include search
-path to ensure compilation works, otherwise you’ll need to add that in
-the compilation command.</p>
+<p>By contrast, we could write a simulation of the stream for each test,
+called a &quot;server stub&quot;.</p>
 </div>
 <div class="paragraph">
-<p>Then, building this test is, of course, trivial…​</p>
+<p>For example, when the stream is empty nothing should happen.  We
+hopefully get <code>NULL</code> from <code>read_paragraph</code> when the stream is
+exhausted.  That is, it just returns a steady stream of `EOF`s.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ gcc -c first_test.c
-$ gcc first_test.o -lcgreen -o first_test
-$ ./first_test</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Invoking the executable should give…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Running &quot;main&quot; (0 tests)...
-Completed &quot;main&quot;:  in 42ms.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>All of the above rather assumes you are working in a Unix like
-environment, probably with 'gcc'. The code is pretty much standard
-C99, so any C compiler should work.  <strong>Cgreen</strong> should compile on all
-systems that support the <code>sys/msg.h</code> messaging library.  It has been
-tested on Linux, MacOSX, Cygwin and Windows.</p>
-</div>
-<div class="paragraph">
-<p>So far we have tried compilation, and shown that the test suite
-actually runs.  Let’s add a meaningless test or two so that you can
-see how it runs…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">#include &lt;cgreen/cgreen.h&gt;
-
-Describe(Cgreen);
-BeforeEach(Cgreen) {}
-AfterEach(Cgreen) {}
-
-Ensure(Cgreen, passes_this_test) {
-    assert_that(1 == 1);
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">static int empty_stream(void *stream) {
+    return EOF;
 }
 
-Ensure(Cgreen, fails_this_test) {
-    assert_that(0 == 1);
-}
+Describe(ParagraphReader);
+BeforeEach(ParagraphReader) {}
+AfterEach(ParagraphReader) {}
 
-int main(int argc, char **argv) {
-    TestSuite *suite = create_test_suite();
-    add_test_with_context(suite, Cgreen, passes_this_test);
-    add_test_with_context(suite, Cgreen, fails_this_test);
-    return run_test_suite(suite, create_text_reporter());
+Ensure(ParagraphReader, gives_null_when_reading_empty_stream) {
+    assert_that(read_paragraph(&amp;empty_stream, NULL), is_null);
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>A test is denoted by the macro <code>Ensure</code> which takes an optional
-context (<code>Cgreen</code>) and a, hopefully descriptive, testname
-(<code>passes_this_test</code>). You add the test to your suite using
-<code>add_test_with_context()</code>.</p>
+<p>Our simulation is easy here, because our fake stream returns only one
+value.  Things are harder when the function result changes from call
+to call as a real stream would.  Simulating this would mean messing
+around with static variables and counters that are reset for each
+test.  And of course, we will be writing quite a few stubs. Often a
+different one for each test. That’s a lot of clutter.</p>
 </div>
 <div class="paragraph">
-<p>On compiling and running, we now get the output…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Running &quot;main&quot; (2 tests)...
-first_tests.c:12: Failure: fails_this_test
-	Expected [0 == 1] to [be true]
-
-Completed &quot;main&quot;: 1 pass, 1 failure in 42ms.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>TextReporter</code>, created by the call to <code>create_text_reporter()</code>, is
-the easiest way to output the test results. It prints the failures as
-intelligent and expressive text messages on your console.</p>
-</div>
-<div class="paragraph">
-<p>Of course &quot;0&quot; would never equal &quot;1&quot;, but this shows that <strong>Cgreen</strong>
-presents the value you expect (<code>[be true]</code>) <em>and</em> the expression
-that you want to assert (<code>[0 == 1]</code>). We can also see a handy short
-form for asserting boolean expressions (<code>assert_that(0 == 1);</code>).</p>
-</div>
+<p><strong>Cgreen</strong> can handle this clutter for us by letting us write a single
+programmable function for all our tests.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="tdd_with_cgreen">1.4. Five Minutes Doing TDD with Cgreen</h3>
+<h3 id="_record_and_playback">3.2. Record and Playback</h3>
 <div class="paragraph">
-<p>For a more realistic example we need something to test. We’ll pretend
-that we are writing a function to split the words of a sentence in
-place. It would do this by replacing any spaces with string
-terminators and returns the number of conversions plus one.  Here is
-an example of what we have in mind…​</p>
+<p>We can redo our example by creating a <code>stream_stub()</code> function. We can
+call it anything we want, and since I thought we wanted to have a
+stubbed stream…​</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">char *sentence = strdup(&quot;Just the first test&quot;);
-word_count = split_words(sentence);</code></pre>
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">static int stream_stub(void *stream) {
+    return (int)mock(stream);
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The variable <code>sentence</code> should now point at
-&quot;Just\0the\0first\0test&quot;. Not an obviously useful function, but we’ll
-be using it for something more practical later.</p>
+<p>Hardly longer that our trivial server stub above, it is just a macro
+to generate a return value, but we can reuse this in test after
+test. Let’s see how.</p>
 </div>
 <div class="paragraph">
-<p>This time around we’ll add a little more structure to our
-tests. Rather than having the test as a stand alone program, we’ll
-separate the runner from the test cases.  That way, multiple test
-suites of test cases can be included in the <code>main()</code> runner file.
-This makes it less work to add more tests later.</p>
-</div>
-<div class="paragraph">
-<p>Here is the, so far empty, test case in <code>words_test.c</code>…​</p>
+<p>For our simple example above we just tell it to always return <code>EOF</code>…​</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c" data-lang="c">#include &lt;cgreen/cgreen.h&gt;
 #include &lt;cgreen/mocks.h&gt;
 
-#include &quot;words.h&quot;
-#include &lt;string.h&gt;
+char *read_paragraph(int (*read)(void *), void *stream);
 
-Describe(Words);
-BeforeEach(Words) {}
-AfterEach(Words) {}
-
-TestSuite *words_tests() {
-    TestSuite *suite = create_test_suite();
-    return suite;
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Here is the <code>all_tests.c</code> test runner…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">#include &lt;cgreen/cgreen.h&gt;
-
-TestSuite *words_tests();
-
-int main(int argc, char **argv) {
-    TestSuite *suite = create_test_suite();
-    add_suite(suite, words_tests());
-    if (argc &gt; 1) {
-        return run_single_test(suite, argv[1], create_text_reporter());
-    }
-    return run_test_suite(suite, create_text_reporter());
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><strong>Cgreen</strong> has two ways of running tests. The default is to run all
-tests in their own protected processes. This is what happens if you
-invoke <code>run_test_suite()</code>. All tests are then completely independent
-since they run in separate processes, preventing a single run-away
-test from bringing the whole program down with it. It also ensures
-that one test cannot leave any state to the next, thus forcing you to
-setup the prerequisites for each test correctly and clearly.</p>
-</div>
-<div class="paragraph">
-<p>Building this scaffolding…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ gcc -c words_test.c
-$ gcc -c all_tests.c
-$ gcc words_test.o all_tests.o -lcgreen -o all_tests</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>…​and executing the result gives the familiar…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Running &quot;main&quot; (0 tests)...
-Completed &quot;words_tests&quot;:  in 42ms.
-Completed &quot;main&quot;:  in 42ms.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Note that we get an extra level of output here, we have both <code>main</code>
-and <code>words_tests</code>. That’s because <code>all_tests.c</code> adds the words test
-suite to its own (named <code>main</code> since it was created in the function
-<code>main()</code>). All this scaffolding is pure overhead, but from now on
-adding tests will be a lot easier.</p>
-</div>
-<div class="paragraph">
-<p>Here is a first test for <code>split_words()</code> in <code>words_test.c</code>…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">#include &lt;cgreen/cgreen.h&gt;
-
-#include &quot;words.h&quot;
-#include &lt;string.h&gt;
-
-Describe(Words);
-BeforeEach(Words) {}
-AfterEach(Words) {}
-
-Ensure(Words, returns_word_count) {
-    char *sentence = strdup(&quot;Birds of a feather&quot;);
-    int word_count = split_words(sentence);
-    assert_that(word_count, is_equal_to(4));
-    free(sentence);
+static int stream_stub(void *stream) {
+    return (int)mock(stream);
 }
 
-TestSuite *words_tests() {
-    TestSuite *suite = create_test_suite();
-    add_test_with_context(suite, Words, returns_word_count);
-    return suite;
+Describe(ParagraphReader);
+BeforeEach(ParagraphReader) {}
+AfterEach(ParagraphReader) {}
+
+Ensure(ParagraphReader, gives_null_when_reading_empty_stream) {
+    always_expect(stream_stub, will_return(EOF));                                 <i class="conum" data-value="1"></i><b>(1)</b>
+    assert_that(read_paragraph(&amp;stream_stub, NULL), is_null);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>always_expect()</code> macro takes as arguments the function
+name and defines the return value using the call to
+<code>will_return()</code>. This is a declaration of an expectation of a call to
+the stub, and we have told our <code>stream_stub()</code> to always return <code>EOF</code>
+when called.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let’s see if our production code actually works…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Running &quot;stream&quot; (1 tests)...
+Completed &quot;ParagraphReader&quot;: 1 pass in 42ms.
+Completed &quot;stream&quot;: 1 pass in 42ms.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So far, so good.  On to the next test.</p>
+</div>
+<div class="paragraph">
+<p>If we want to test a one character line, we have to send the
+terminating <code>EOF</code> or <code>&quot;\n&quot;</code> as well as the single character.
+Otherwise our code will loop forever, giving an infinite line of that
+character.</p>
+</div>
+<div class="paragraph">
+<p>Here is how we can do this…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(ParagraphReader, gives_one_character_line_for_one_character_stream) {
+    expect(stream_stub, will_return('a'));
+    expect(stream_stub, will_return(EOF));
+    char *line = read_paragraph(&amp;stream_stub, NULL);
+    assert_that(line, is_equal_to_string(&quot;a&quot;));
+    free(line);
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>assert_that()</code> macro takes two parameters, the value to assert
-and a constraint. The constraints comes in various forms. In this case
-we use the probably most common, <code>is_equal_to()</code>. With the default
-<code>TextReporter</code> the message is sent to <code>STDOUT</code>.</p>
+<p>Unlike the <code>always_expect()</code> instruction, <code>expect()</code> sets up an
+expectation of a single call and specifying <code>will_return()</code> sets the
+single return value for just that call.  It acts like a record and
+playback model.  Successive expectations map out the return sequence
+that will be given back once the test proper starts.</p>
 </div>
 <div class="paragraph">
-<p>To get this to compile we need to create the <code>words.h</code> header file…​</p>
+<p>We’ll add this test to the suite and run it…​</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">int split_words(char *sentence);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>…​and to get the code to link we need a stub function in <code>words.c</code>…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">int split_words(char *sentence) {
-    return 0;
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>A full build later…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ gcc -c all_tests.c
-$ gcc -c words_test.c
-$ gcc -c words.c
-$ gcc all_tests.o words_test.o words.o -lcgreen -o all_tests
-$ ./all_tests</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>…​and we get the more useful response…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Running &quot;main&quot; (1 tests)...
-words_tests.c:13: Failure: words_tests -&gt; returns_word_count
-	Expected [word_count] to [equal] [4]
-		actual value:			[0]
-		expected value:			[4]
+<pre>Running &quot;stream&quot; (2 tests)...
+stream_tests.c:23: Failure: ParagraphReader -&gt; gives_one_character_line_for_one_character_stream
+	Expected [line] to [equal string] [&quot;a&quot;]
+		actual value:			[&quot;¡&quot;]
+		expected to equal:		[&quot;a&quot;]
 
-Completed &quot;words_tests&quot;: 1 failure in 42ms.
-Completed &quot;main&quot;: 1 failure in 42ms.</pre>
+Completed &quot;ParagraphReader&quot;: 1 pass, 1 failure in 42ms.
+Completed &quot;stream&quot;: 1 pass, 1 failure in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The breadcrumb trail following the &quot;Failure&quot; text is the nesting of
-the tests. It goes from the test suites, which can be nested in each
-other, through the test function, and finally to the message from the
-assertion. In the language of <strong>Cgreen</strong>, a &quot;failure&quot; is a mismatched
-assertion, or constraint, and an &quot;exception&quot; occurs when a test fails
-to complete for any reason, e.g. a segmentation fault.</p>
-</div>
-<div class="paragraph">
-<p>We could get this to pass just by returning the value 4. Doing TDD in
-really small steps, you would actually do this, but we’re not teaching
-TDD here. Instead we’ll go straight to the core of the
-implementation…​</p>
+<p>Oops. Our code under test doesn’t work. Already we need a fix…​</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">#include &lt;string.h&gt;
-
-int split_words(char *sentence) {
-  int i, count = 1;
-  for (i = 0; i &lt; strlen(sentence); i++) {
-    if (sentence[i] == ' ') {
-      count++;
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">char *read_paragraph(int (*read)(void *), void *stream) {
+    int buffer_size = 0, length = 0;
+    char *buffer = NULL;
+    int ch;
+    while ((ch = (*read)(stream)) != EOF) {
+        if (++length &gt; buffer_size) {
+            buffer_size += 100;
+            buffer = (char *)realloc(buffer, buffer_size + 1);
+        }
+        if ((buffer[length - 1] = ch) == '\n') {              <i class="conum" data-value="1"></i><b>(1)</b>
+            break;
+        }
+        buffer[length] = '\0';                                <i class="conum" data-value="2"></i><b>(2)</b>
     }
-  }
-  return count;
+    return buffer;
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>After moving the indexing here…​</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>and here…​</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>around a bit everything is fine:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Running &quot;stream&quot; (2 tests)...
+Completed &quot;ParagraphReader&quot;: 2 passes in 42ms.
+Completed &quot;stream&quot;: 2 passes in 42ms.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So, how do the <strong>Cgreen</strong> stubs work?  Each <code>expect()</code> describes one
+call to the stub and a call to <code>will_return()</code> is included it will
+aggregate into a list of return values which are used and returned in
+order as the expected calls arrive.</p>
+</div>
+<div class="paragraph">
+<p>The <code>mock()</code> macro captures the parameter names and the <code><em>func</em></code>
+property (the name of the stub function).  <strong>Cgreen</strong> can then use these
+to look up entries in the return list, and also to generate more
+helpful messages.</p>
+</div>
+<div class="paragraph">
+<p>We can now crank out our tests quite quickly…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(ParagraphReader, gives_one_word_line_for_one_word_stream) {
+    expect(stream_stub, will_return('t'));
+    expect(stream_stub, will_return('h'));
+    expect(stream_stub, will_return('e'));
+    always_expect(stream_stub, will_return(EOF));
+    assert_that(read_paragraph(&amp;stream_stub, NULL), is_equal_to_string(&quot;the&quot;));
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Running it gives…​</p>
+<p>I’ve been a bit naughty.  As each test runs in its own process, I
+haven’t bothered to free the pointers to the paragraphs.  I’ve just
+let the operating system do it.  Purists may want to add the extra
+clean up code.</p>
+</div>
+<div class="paragraph">
+<p>I’ve also used <code>always_expect()</code> for the last instruction.  Without
+this, if the stub is given an instruction it does not expect, it will
+throw a test failure.  This is overly restrictive, as our
+<code>read_paragraph()</code> function could quite legitimately call the stream
+after it had run off of the end.  OK, that would be odd behaviour, but
+that’s not what we are testing here.  If we were, it would be placed
+in a test of its own.  The <code>always_expect()</code> call tells <strong>Cgreen</strong> to
+keep going after the first three letters, allowing extra calls.</p>
+</div>
+<div class="paragraph">
+<p>As we build more and more tests, they start to look like a
+specification of the wanted behaviour…​</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>Running &quot;main&quot; (1 tests)...
-Completed &quot;words_tests&quot;: 1 pass in 42ms.
-Completed &quot;main&quot;: 1 pass in 42ms.</pre>
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(ParagraphReader, drops_line_ending_from_word_and_stops) {
+    expect(stream_stub, will_return('t'));
+    expect(stream_stub, will_return('h'));
+    expect(stream_stub, will_return('e'));
+    expect(stream_stub, will_return('\n'));
+    assert_that(read_paragraph(&amp;stream_stub, NULL), is_equal_to_string(&quot;the&quot;));
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>There is actually a hidden problem here, but our tests still passed so
-we’ll pretend we didn’t notice.</p>
+<p>…​and just for luck…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(ParagraphReader, gives_empty_line_for_single_line_ending) {
+    expect(stream_stub, will_return('\n'));
+    assert_that(read_paragraph(&amp;stream_stub, NULL), is_equal_to_string(&quot;&quot;));
+}</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p>So it’s time to add another test. We want to confirm that the string
-is broken into separate words…​</p>
+<p>This time we musn’t use <code>always_return()</code>. We want to leave the stream
+where it is, ready for the next call to <code>read_paragraph()</code>. If we call
+the stream beyond the line ending, we want to fail.</p>
+</div>
+<div class="paragraph">
+<p>Oops, that was a little too fast. Turns out we are failing anyway…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Running &quot;stream&quot; (5 tests)...
+stream_tests.c:40: Failure: ParagraphReader -&gt; drops_line_ending_from_word_and_stops
+	Expected [read_paragraph(&amp;stream_stub, ((void *)0))] to [equal string] [&quot;the&quot;]
+		actual value:			[&quot;the
+&quot;]
+		expected to equal:		[&quot;the&quot;]
+
+stream_tests.c:45: Failure: ParagraphReader -&gt; gives_empty_line_for_single_line_ending
+	Expected [read_paragraph(&amp;stream_stub, ((void *)0))] to [equal string] [&quot;&quot;]
+		actual value:			[&quot;
+&quot;]
+		expected to equal:		[&quot;&quot;]
+
+Completed &quot;ParagraphReader&quot;: 3 passes, 2 failures in 42ms.
+Completed &quot;stream&quot;: 3 passes, 2 failures in 42ms.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Clearly we are passing through the line ending.
+Another fix later…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">char *read_paragraph(int (*read)(void *), void *stream) {
+    int buffer_size = 0, length = 0;
+    char *buffer = NULL;
+    int ch;
+    while ((ch = (*read)(stream)) != EOF) {
+        if (++length &gt; buffer_size) {
+            buffer_size += 100;
+            buffer = (char *)realloc(buffer, buffer_size + 1);
+        }
+        if ((buffer[length - 1] = ch) == '\n') {
+            buffer[--length] = '\0';
+            break;
+        }
+        buffer[length] = '\0';
+    }
+    return buffer;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And we are passing again…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Running &quot;stream&quot; (5 tests)...
+Completed &quot;ParagraphReader&quot;: 5 passes in 42ms.
+Completed &quot;stream&quot;: 5 passes in 42ms.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are no limits to the number of stubbed methods within a test,
+only that two stubs cannot have the same name. The following will
+cause problems…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">static int stream_stub(void *stream) {
+    return (int)mock(stream);
+}
+
+Ensure(Streams, bad_test) {
+    expect(stream_stub, will_return('a'));
+    do_stuff(&amp;stream_stub, &amp;stream_stub);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You <em>could</em> program the same stub to return values for the two
+streams, but that would make a very brittle test. Since we’d be making
+it heavily dependent on the exact internal behaviour that we are
+trying to test, or test drive, it will break as soon as we change that
+implementation. The test will also become very much harder to read and
+understand. And we really don’t want that.</p>
+</div>
+<div class="paragraph">
+<p>So, it will be necessary to have two stubs to make this test behave,
+but that’s not a problem…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">static int first_stream_stub(void *stream) {
+    return (int)mock(stream);
+}
+
+static int second_stream_stub(void *stream) {
+    return (int)mock(stream);
+}
+
+Ensure(Streams, good_test) {
+    expect(first_stream_stub, will_return('a'));
+    expect(second_stream_stub, will_return('a'));
+    do_stuff(&amp;first_stream_stub, &amp;second_stream_stub);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We now have a way of writing fast, clear tests with no external
+dependencies. The information flow is still one way though, from stub
+to the code under test. When our code calls complex procedures, we
+won’t want to pick apart the effects to infer what happened. That’s
+too much like detective work. And why should we? We just want to
+know that we dispatched the correct information down the line.</p>
+</div>
+<div class="paragraph">
+<p>Things get more interesting when we think of the traffic going the
+other way, from code to stub. This gets us into the same territory as
+mock objects.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_setting_expectations_on_mock_functions">3.3. Setting Expectations on Mock Functions</h3>
+<div class="paragraph">
+<p>To swap the traffic flow, we’ll look at an outgoing example instead.
+Here is the prewritten production code…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">void by_paragraph(int (*read)(void *), void *in, void (*write)(void *, char *), void *out) {
+    while (1) {
+        char *line = read_paragraph(read, in);
+        if ((line == NULL) || (strlen(line) == 0)) {
+            return;
+        }
+        (*write)(out, line);
+        free(line);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is the start of a formatter utility.  Later filters will probably
+break the paragaphs up into justified text, but right now that is all
+abstracted behind the <code>void write(void *, char *)</code> interface.  Our
+current interests are: does it loop through the paragraphs, and does
+it crash?</p>
+</div>
+<div class="paragraph">
+<p>We could test correct paragraph formation by writing a stub that
+collects the paragraphs into a <code>struct</code>.  We could then pick apart
+that <code>struct</code> and test each piece with assertions.  This approach is
+extremely clumsy in C.  The language is just not suited to building
+and tearing down complex edifices, never mind navigating them with
+assertions.  We would badly clutter our tests.</p>
+</div>
+<div class="paragraph">
+<p>Instead we’ll test the output as soon as possible, right in
+the called function…​</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c" data-lang="c">...
-Ensure(Words, returns_word_count) {
-    ...
+void expect_one_letter_paragraph(void *stream, char *paragraph) {
+    assert_that(paragraph, is_equal_to_string(&quot;a&quot;));
 }
 
-Ensure(Words, converts_spaces_to_zeroes) {
-    char *sentence = strdup(&quot;Birds of a feather&quot;);
-    split_words(sentence);
-    int comparison = memcmp(&quot;Birds\0of\0a\0feather&quot;, sentence, strlen(sentence));
-    assert_that(comparison, is_equal_to(0));
-    free(sentence);
+Ensure(Formatter, makes_one_letter_paragraph_from_one_character_input) {
+    by_paragraph(
+            &amp;one_character_stream,
+            NULL,
+            &amp;expect_one_letter_paragraph,
+            NULL);
+}
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By placing the assertions into the mocked function, we keep the tests
+minimal.  The catch with this method is that we are back to writing
+individual functions for each test.  We have the same problem as we
+had with hand coded stubs.</p>
+</div>
+<div class="paragraph">
+<p>Again, <strong>Cgreen</strong> has a way to automate this.  Here is the rewritten
+test…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">static int reader(void *stream) {
+    return (int)mock(stream);
+}
+
+static void writer(void *stream, char *paragraph) {
+    mock(stream, paragraph);
+}
+
+Ensure(Formatter, makes_one_letter_paragraph_from_one_character_input) {
+    expect(reader, will_return('a'));
+    always_expect(reader, will_return(EOF));
+    expect(writer, when(paragraph, is_equal_to_string(&quot;a&quot;)));
+    by_paragraph(&amp;reader, NULL, &amp;writer, NULL);
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Sure enough, we get a failure…​</p>
+<p>Where are the assertions?</p>
+</div>
+<div class="paragraph">
+<p>Unlike our earlier stub, <code>reader()</code> can now check its parameters.  In
+object oriented circles, an object that checks its parameters as well
+as simulating behaviour is called a mock object.  By analogy
+<code>reader()</code> is a mock function, or mock callback.</p>
+</div>
+<div class="paragraph">
+<p>Using the <code>expect</code> macro, we have set up the expectation that
+<code>writer()</code> will be called just once.  That call must have the string
+<code>&quot;a&quot;</code> for the <code>paragraph</code> parameter.  If the actual value of that
+parameter does not match, the mock function will issue a failure
+straight to the test suite.  This is what saves us writing a lot of
+assertions.</p>
+</div>
+<div class="paragraph">
+<p>When specifying behavior of mocks there are three parts. First, how
+often the specified behaviour or expectation will be executed:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Macro</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Description</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>expect(function, …​)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Expected once, in order</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>always_expect(function, …​)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Expect this behavior from here onwards</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>never_expect(function)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">From this point this mock function must never be called</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>You can specify constraints and behaviours for each expectation
+(except for <code>never_expect()</code> naturally). A constraint places
+restrictions on the parameters (and will tell you if the expected
+restriction was not met), and a behaviour specifies what the mock
+should do if the parameter constraints are met.</p>
+</div>
+<div class="paragraph">
+<p>A parameter constraint is defined using the <code>when(parameter,
+constraint)</code> macro. It takes two parameters:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Parameter</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Description</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>parameter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the parameter to the mock function</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>constraint</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A constraint placed on that parameter</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>There is a multitude of constraints available (actually, exactly the
+same as for the assertions we saw earlier):</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Constraint</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Type</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_equal_to(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_not_equal_to(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_greater_than(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_less_than(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_equal_to_contents_of(pointer, size_of_contents)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bytes/Structures</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_not_equal_to_contents_of(pointer, size_of_contents)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bytes/Structures</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_equal_to_string(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_not_equal_to_string(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contains_string(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>does_not_contain_string(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>begins_with_string(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_equal_to_double(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Double</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_not_equal_to_double(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Double</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_less_than_double(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Double</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_greater_than_double(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Double</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>For the double valued constraints you can set the number of
+significant digits to consider a match with a call to
+<code>significant_figures_for_assert_double_are(int figures)</code>.
+The <a href="chap3.html#floating_point_comparison_algorithm">section on how to work with doubles</a> has a more detailed
+discussion of the algorithm used for comparing floating point numbers.</p>
+</div>
+<div class="paragraph">
+<p>Then there are two ways to return results:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Macro</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Description</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>will_return(value)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return the value from the mock function (which needs to be declared returning that type</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>will_set_contents_of_parameter(parameter_name, value, size)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Writes the value in the referenced parameter</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>You can combine these in various ways:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>Running &quot;main&quot; (2 tests)...
-words_tests.c:21: Failure: words_tests -&gt; converts_spaces_to_zeroes
-	Expected [comparison] to [equal] [0]
-		actual value:			[-32]
-		expected value:			[0]
-
-Completed &quot;words_tests&quot;: 1 pass, 1 failure in 42ms.
-Completed &quot;main&quot;: 1 pass, 1 failure in 42ms.</pre>
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">  expect(mocked_file_writer,
+        when(data, is_equal_to(42)),
+        will_return(EOF));
+  expect(mocked_file_reader,
+        when(file, is_equal_to_contents_of(&amp;FD, sizeof(FD))),
+        when(input, is_equal_to_string(&quot;Hello world!&quot;),
+        will_set_contents_of_parameter(status, FD_CLOSED, sizeof(bool))));</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Not surprising given that we haven’t written the code yet.</p>
+<p>If multiple <code>when()</code> are specified they all need to be fullfilled. You
+can of course only have one for each of the parameters of your mock
+function.</p>
 </div>
 <div class="paragraph">
-<p>The fix…​</p>
+<p>You can also have multiple <code>will_set_contents_of_parameter()</code> in an
+expectation, one for each reference parameter, but naturally only one
+<code>will_return()</code>.</p>
+</div>
+<div class="paragraph">
+<p>It’s about time we actually ran our test…​</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">#include &lt;string.h&gt;
+<pre>Running &quot;formatter&quot; (1 tests)...
+Completed &quot;Formatter&quot;: 1 pass in 42ms.
+Completed &quot;formatter&quot;: 1 pass in 42ms.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Confident that a single character works, we can further specify the
+behaviour.  Firstly an input sequence…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(Formatter, makes_one_paragraph_if_no_line_endings) {
+    expect(reader, will_return('a'));
+    expect(reader, will_return(' '));
+    expect(reader, will_return('b'));
+    expect(reader, will_return(' '));
+    expect(reader, will_return('c'));
+    always_expect(reader, will_return(EOF));
+    expect(writer, when(paragraph, is_equal_to_string(&quot;a b c&quot;)));
+    by_paragraph(&amp;reader, NULL, &amp;writer, NULL);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A more intelligent programmer than me would place all these calls in a
+loop.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Running &quot;formatter&quot; (2 tests)...
+Completed &quot;Formatter&quot;: 2 passes in 42ms.
+Completed &quot;formatter&quot;: 2 passes in 42ms.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next, checking an output sequence…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(Formatter, generates_separate_paragraphs_for_line_endings) {
+    expect(reader, will_return('a'));
+    expect(reader, will_return('\n'));
+    expect(reader, will_return('b'));
+    expect(reader, will_return('\n'));
+    expect(reader, will_return('c'));
+    always_expect(reader, will_return(EOF));
+    expect(writer, when(paragraph, is_equal_to_string(&quot;a&quot;)));
+    expect(writer, when(paragraph, is_equal_to_string(&quot;b&quot;)));
+    expect(writer, when(paragraph, is_equal_to_string(&quot;c&quot;)));
+    by_paragraph(&amp;reader, NULL, &amp;writer, NULL);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Again we can se that the <code>expect()</code> calls follow a record and playback
+model.  Each one tests a successive call.  This sequence confirms that
+we get <code>&quot;a&quot;</code>, <code>&quot;b&quot;</code> and <code>&quot;c&quot;</code> in order.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Running &quot;formatter&quot; (3 tests)...
+Completed &quot;Formatter&quot;: 5 passes in 42ms.
+Completed &quot;formatter&quot;: 5 passes in 42ms.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So, why the 5 passes? Each <code>expect()</code> with a constrait is actually
+an assert. It asserts that the call specified is actually made with
+the parameters given and in the specified order. In this case all the
+expected calls were made.</p>
+</div>
+<div class="paragraph">
+<p>Then we’ll make sure the correct stream pointers are passed to the
+correct functions.  This is a more realistic parameter check…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(Formatter, pairs_the_functions_with_the_resources) {
+    expect(reader, when(stream, is_equal_to(1)), will_return('a'));
+    always_expect(reader, when(stream, is_equal_to(1)), will_return(EOF));
+    expect(writer, when(stream, is_equal_to(2)));
+    by_paragraph(&amp;reader, (void *)1, &amp;writer, (void *)2);
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Running &quot;formatter&quot; (4 tests)...
+Completed &quot;Formatter&quot;: 9 passes in 42ms.
+Completed &quot;formatter&quot;: 9 passes in 42ms.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And finally we’ll specify that the writer is not called if
+there is no paragraph.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(Formatter, ignores_empty_paragraphs) {
+    expect(reader, will_return('\n'));
+    always_expect(reader, will_return(EOF));
+    never_expect(writer);
+    by_paragraph(&amp;reader, NULL, &amp;writer, NULL);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This last test is our undoing…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Running &quot;formatter&quot; (5 tests)...
+formatter_tests.c:59: Failure: Formatter -&gt; ignores_empty_paragraphs
+	Mocked function [writer] has an expectation that it will never be called, but it was
 
-int split_words(char *sentence) {
-  int i, count = 1;
-  for (i = 0; i &lt; strlen(sentence); i++) {
-    if (sentence[i] == ' ') {
-      sentence[i] = '\0';
-      count++;
+Completed &quot;Formatter&quot;: 9 passes, 1 failure in 42ms.
+Completed &quot;formatter&quot;: 9 passes, 1 failure in 42ms.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Obviously blank lines are still being dispatched to the <code>writer()</code>.
+Once this is pointed out, the fix is obvious…​</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">void by_paragraph(int (*read)(void *), void *in, void (*write)(void *, char *), void *out) {
+    while (1) {
+        char *line = read_paragraph(read, in);
+        if ((line == NULL) || (strlen(line) == 0)) {
+            return;
+        }
+        (*write)(out, line);
+        free(line);
     }
-  }
-  return count;
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>…​reveals our previous hack…​</p>
+<p>Tests with <code>never_expect()</code> can be very effective at uncovering subtle
+bugs.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>Running &quot;main&quot; (2 tests)...
-words_tests.c:13: Failure: words_tests -&gt; returns_word_count
-	Expected [word_count] to [equal] [4]
-		actual value:			[2]
-		expected value:			[4]
-
-Completed &quot;words_tests&quot;: 1 pass, 1 failure in 42ms.
-Completed &quot;main&quot;: 1 pass, 1 failure in 42ms.</pre>
+<pre>Running &quot;formatter&quot; (5 tests)...
+Completed &quot;Formatter&quot;: 9 passes in 42ms.
+Completed &quot;formatter&quot;: 9 passes in 42ms.</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Our earlier test now fails, because we have affected the <code>strlen()</code>
-call in our loop.  Moving the length calculation out of the loop…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">int split_words(char *sentence) {
-  int i, count = 1, length = strlen(sentence);
-  for (i = 0; i &lt; length; i++) {
-    ...
-  }
-  return count;
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>…​restores order…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Running &quot;main&quot; (2 tests)...
-Completed &quot;words_tests&quot;: 2 passes in 42ms.
-Completed &quot;main&quot;: 2 passes in 42ms.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>It’s nice to keep the code under control while we are actually writing
-it, rather than debugging later when things are more complicated.</p>
-</div>
-<div class="paragraph">
-<p>That was pretty straight forward. Let’s do something more interesting.</p>
+<p>All done.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_what_are_mock_functions">1.5. What are Mock Functions?</h3>
+<h3 id="_mocks_are">3.4. Mocks Are…​</h3>
 <div class="paragraph">
-<p>The next example is a more realistic extension of our previous
-attempts. As in real life we first implement something basic and then
-we go for the functionality that we need. In this case a function that
-invokes a callback for each word found in a sentence. Something
-like…​</p>
+<p>Using mocks is a very handy way to isolate a unit by catching and
+controlling calls to external units. Depending on your style of coding
+two schools of thinking have emerged. And of course <strong>Cgreen</strong> supports
+both!</p>
+</div>
+<div class="sect3">
+<h4 id="_strict_or_loose_mocks">3.4.1. Strict or Loose Mocks</h4>
+<div class="paragraph">
+<p>The two schools are thinking a bit differently about what mock
+expectations means. Does it mean that all external calls must be
+declared and expected? What happens if a call was made to a mock that
+wasn’t expected? And vice versa, if an expected call was not made?</p>
+</div>
+<div class="paragraph">
+<p>Actually, the thinking is not only a school of thought, but you might
+want to switch from one to the other. So <strong>Cgreen</strong> allows for that too.</p>
+</div>
+<div class="paragraph">
+<p>By default <strong>Cgreen</strong> mocks are 'strict', which means that a call to
+an non-expected mock will be considered a failure. So will an expected
+call that was not fullfilled. You might consider this a way to define
+a unit through all its exact behaviours towards its neighbours.</p>
+</div>
+<div class="paragraph">
+<p>On the other hand, 'loose' mocks are looser. They allow both
+unfulfilled expectations and try to handle unexpected calls in a
+reasonable way.</p>
+</div>
+<div class="paragraph">
+<p>You can use both with in the same suite of tests using the call
+<code>cgreen_mocks_are(strict_mocks);</code> and <code>cgreen_mocks_are(loose_mocks);</code>
+respectively. Typically you would place that call at the beginning of
+the test, or in a setup or <code>BeforeEach()</code> if it applies to all tests
+in a suite.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_learning_mocks">3.4.2. Learning Mocks</h4>
+<div class="paragraph">
+<p>Working with legacy code and trying to apply TDD, BDD or even simply
+add some unit tests is not easy. You’re working with unknown code that
+does unknown things with unknown counterparts.</p>
+</div>
+<div class="paragraph">
+<p>So the first step would be to isolate the unit. We won’t go into
+details on how to do that here, but basically you would replace the
+interface to other units with mocks. This is a somewhat tedious manual
+labor, but will result in an isolated unit where you can start
+applying your unit tests.</p>
+</div>
+<div class="paragraph">
+<p>Once you have your unit isolated in a harness of mocks, we need to
+figure out which calls it does to other units, now replaced by mocks,
+in the specific case we are trying to test.</p>
+</div>
+<div class="paragraph">
+<p>This might be complicated, so <strong>Cgreen</strong> makes that a bit simpler. There
+is a third 'mode' of the <strong>Cgreen</strong> mocks, the <em>learning mocks</em>.</p>
+</div>
+<div class="paragraph">
+<p>If you temporarily add the call <code>cgreen_mocks_are(learning_mocks);</code> at
+the beginning of your unit test, the mocks will record all calls and
+present a list of those calls in order, including the actual parameter
+values, on the standard output.</p>
+</div>
+<div class="paragraph">
+<p>So let’s look at the following example from the <strong>Cgreen</strong> unit
+tests. It’s a bit contorted since the test actually call the mocked
+functions directly, but I believe it will serve as an example.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">void act_on_word(const char *word, void *memo) { ... }
-words(&quot;This is a sentence&quot;, &amp;act_on_word, &amp;memo);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Here the <code>memo</code> pointer is just some accumulated data that the
-<code>act_on_word()</code> callback might work with. Other people will write the
-<code>act_on_word()</code> function and probably many other functions like
-it. The callback is actually a flex point, and not of interest right
-now.</p>
-</div>
-<div class="paragraph">
-<p>The function under test is the <code>words()</code> function and we want to make
-sure it walks the sentence correctly, dispatching individual words as
-it goes. So what calls are made are very important. How to test this?</p>
-</div>
-<div class="paragraph">
-<p>Let’s start with a one word sentence. In this case we would expect
-the callback to be invoked once with the only word, right? Here is
-the test for that…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">#include &lt;cgreen/cgreen.h&gt;
-#include &lt;cgreen/mocks.h&gt;
-...
-void mocked_callback(const char *word, void *memo) {
-    mock(word, memo);
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">static int integer_out() {
+    return (int)mock();
 }
 
-Ensure(Words, invokes_callback_once_for_single_word_sentence) {
-    expect(mocked_callback,
-           when(word, is_equal_to_string(&quot;Word&quot;)), when(memo, is_null));
-    words(&quot;Word&quot;, &amp;mocked_callback, NULL);
+static char *string_out(int p1) {
+    return (char *)mock(p1);
 }
 
-TestSuite *words_tests() {
-    TestSuite *suite = create_test_suite();
-    ...
-    add_test_with_context(suite, Words, invokes_callback_once_for_single_word_sentence);
-    return suite;
+Ensure(LearningMocks, emit_pastable_code) {
+    cgreen_mocks_are(learning_mocks);
+    string_out(1);
+    string_out(2);
+    integer_out();
+    integer_out();
+    string_out(3);
+    integer_out();
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>What is the funny looking <code>mock()</code> function?</p>
+<p>We can see the call to <code>cgreen_mocks_are()</code> starting the test and
+setting the mocks into learning mode.</p>
 </div>
 <div class="paragraph">
-<p>A mock is basically a programmable object. In C objects are limited
-to functions, so this is a mock function. The macro <code>mock()</code> compares
-the incoming parameters with any expected values and dispatches
-messages to the test suite if there is a mismatch. It also returns
-any values that have been preprogrammed in the test.</p>
-</div>
-<div class="paragraph">
-<p>The test is <code>invokes_callback_once_for_single_word_sentence()</code>. It
-programs the mock function using the <code>expect()</code> macro. It expects a
-single call, and that single call should use the parameters <code>&quot;Word&quot;</code>
-and <code>NULL</code>. If they don’t match, we will get a test failure.</p>
-</div>
-<div class="paragraph">
-<p>So when the code under test (our <code>words()</code> function) calls the
-injected <code>mocked_callback()</code> it in turn will call <code>mock()</code> with the
-actual parameters.</p>
-</div>
-<div class="paragraph">
-<p>Of course, we don’t add the mock callback to the test suite, it’s not
-a test.</p>
-</div>
-<div class="paragraph">
-<p>For a successful compile and link, the <code>words.h</code> file must now look
-like…​</p>
+<p>If we run this, just as we usually run tests, the following will show
+up in our terminal:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">int split_words(char *sentence);
-void words(const char *sentence, void (*callback)(const char *, void *), void *memo);</code></pre>
+<pre>Running &quot;learning_mocks&quot; (1 tests)...
+LearningMocks -&gt; emit_pastable_code : Learned mocks are
+        expect(string_out, when(p1, is_equal_to(1)));
+        expect(string_out, when(p1, is_equal_to(2)));
+        expect(integer_out);
+        expect(integer_out);
+        expect(string_out, when(p1, is_equal_to(3)));
+        expect(integer_out);
+Completed &quot;LearningMocks&quot;: 0 passes, 0 failures, 0 exceptions.
+Completed &quot;learning_mocks&quot;: 0 passes, 0 failures, 0 exceptions.</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>…​and the <code>words.c</code> file should have the stub…​</p>
+<p>If this was for real we could just copy this and paste it in place of
+the call to <code>cgreen_mocks_are()</code> and we have all the expectations
+done.</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">void words(const char *sentence, void (*callback)(const char *, void *), void *memo) {
-}</code></pre>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Before you can do this you need to implement the mock functions, of
+course. I.e. write functions that replaces the real
+functions and instead calls <code>mock()</code>.
+</td>
+</tr>
+</table>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can try the <code>cgreen-mocker</code> for this, as described in
+<a href="chap8.html#cgreen-mocker"><code>cgreen-mocker</code> - Automated Mocking</a>.
+</td>
+</tr>
+</table>
 </div>
-<div class="paragraph">
-<p>This gives us the expected failing test…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Running &quot;main&quot; (3 tests)...
-words_tests.c:33: Failure: words_tests -&gt; invokes_callback_once_for_single_word_sentence
-	Expected call was not made to mocked function [mocked_callback]
-
-Completed &quot;words_tests&quot;: 2 passes, 1 failure in 42ms.
-Completed &quot;main&quot;: 2 passes, 1 failure in 42ms.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p><strong>Cgreen</strong> reports that the callback was never invoked. We can easily
-get the test to pass by filling out the implementation with…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">void words(const char *sentence, void (*callback)(const char *, void *), void *memo) {
-  (*callback)(sentence, memo);
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>That is, we just invoke it once with the whole string. This is a
-temporary measure to get us moving. For now everything should pass,
-although it doesn’t drive much functionality yet.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Running &quot;main&quot; (3 tests)...
-Completed &quot;words_tests&quot;: 4 passes in 42ms.
-Completed &quot;main&quot;: 4 passes in 42ms.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>That was all pretty conventional, but let’s tackle the trickier case
-of actually splitting the sentence. Here is the test function we will
-add to <code>words_test.c</code>…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(Words, invokes_callback_for_each_word_in_a_phrase) {
-    expect(mocked_callback, when(word, is_equal_to_string(&quot;Birds&quot;)));
-    expect(mocked_callback, when(word, is_equal_to_string(&quot;of&quot;)));
-    expect(mocked_callback, when(word, is_equal_to_string(&quot;a&quot;)));
-    expect(mocked_callback, when(word, is_equal_to_string(&quot;feather&quot;)));
-    words(&quot;Birds of a feather&quot;, &amp;mocked_callback, NULL);
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Each call is expected in sequence. Any failures, or left-over or
-extra calls, and we get failures. We can see all this when we run the
-tests…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Running &quot;main&quot; (4 tests)...
-words_tests.c:38: Failure: words_tests -&gt; invokes_callback_for_each_word_in_a_phrase
-	Expected [[word] parameter in [mocked_callback]] to [equal string] [&quot;Birds&quot;]
-		actual value:			[&quot;Birds of a feather&quot;]
-		expected to equal:		[&quot;Birds&quot;]
-
-words_tests.c:39: Failure: words_tests -&gt; invokes_callback_for_each_word_in_a_phrase
-	Expected call was not made to mocked function [mocked_callback]
-
-words_tests.c:40: Failure: words_tests -&gt; invokes_callback_for_each_word_in_a_phrase
-	Expected call was not made to mocked function [mocked_callback]
-
-words_tests.c:41: Failure: words_tests -&gt; invokes_callback_for_each_word_in_a_phrase
-	Expected call was not made to mocked function [mocked_callback]
-
-Completed &quot;words_tests&quot;: 4 passes, 4 failures in 42ms.
-Completed &quot;main&quot;: 4 passes, 4 failures in 42ms.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The first failure tells the story. Our little <code>words()</code> function
-called the mock callback with the entire sentence. This makes sense,
-because that was the hack we did to get to the next test.</p>
-</div>
-<div class="paragraph">
-<p>Although not relevant to this guide, I cannot resist getting these
-tests to pass.  Besides, we get to use the function we created
-earlier…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">void words(const char *sentence, void (*callback)(const char *, void *), void *memo) {
-  char *words = strdup(sentence);
-  int word_count = split_words(words);
-  char *word = words;
-  while (word_count-- &gt; 0) {
-    (*callback)(word, memo);
-    word = word + strlen(word) + 1;
-  }
-  free(words);
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>And with some work we are rewarded with…​</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Running &quot;main&quot; (4 tests)...
-Completed &quot;words_tests&quot;: 8 passes in 42ms.
-Completed &quot;main&quot;: 8 passes in 42ms.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>More work than I like to admit as it took me three goes to get this
-right. I firstly forgot the <code>+ 1</code> added on to <code>strlen()</code>, then forgot
-to swap <code>sentence</code> for <code>word</code> in the <code>(*callback)()</code> call, and
-finally third time lucky. Of course running the tests each time made
-these mistakes very obvious. It’s taken me far longer to write these
-paragraphs than it has to write the code.</p>
 </div>
 </div>
 </div>
