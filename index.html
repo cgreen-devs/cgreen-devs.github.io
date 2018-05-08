@@ -785,7 +785,7 @@ $ ./first_test</pre>
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;main&quot; (0 tests)...
-Completed &quot;main&quot;:  in 42ms.</pre>
+Completed &quot;main&quot;: No asserts.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -839,6 +839,7 @@ context (<code>Cgreen</code>) and a, hopefully descriptive, testname
 first_tests.c:12: Failure: fails_this_test
 	Expected [0 == 1] to [be true]
 
+  &quot;main&quot;: 1 pass, 1 failure in 42ms.
 Completed &quot;main&quot;: 1 pass, 1 failure in 42ms.</pre>
 </div>
 </div>
@@ -947,8 +948,8 @@ $ gcc words_test.o all_tests.o -lcgreen -o all_tests</pre>
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;main&quot; (0 tests)...
-Completed &quot;words_tests&quot;:  in 42ms.
-Completed &quot;main&quot;:  in 42ms.</pre>
+  &quot;words_tests&quot;: No asserts.
+Completed &quot;main&quot;: No asserts.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1033,7 +1034,7 @@ words_tests.c:13: Failure: words_tests -&gt; returns_word_count
 		actual value:			[0]
 		expected value:			[4]
 
-Completed &quot;words_tests&quot;: 1 failure in 42ms.
+  &quot;words_tests&quot;: 1 failure in 42ms.
 Completed &quot;main&quot;: 1 failure in 42ms.</pre>
 </div>
 </div>
@@ -1072,7 +1073,7 @@ int split_words(char *sentence) {
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;main&quot; (1 tests)...
-Completed &quot;words_tests&quot;: 1 pass in 42ms.
+  &quot;words_tests&quot;: 1 pass in 42ms.
 Completed &quot;main&quot;: 1 pass in 42ms.</pre>
 </div>
 </div>
@@ -1108,10 +1109,10 @@ Ensure(Words, converts_spaces_to_zeroes) {
 <pre>Running &quot;main&quot; (2 tests)...
 words_tests.c:21: Failure: words_tests -&gt; converts_spaces_to_zeroes
 	Expected [comparison] to [equal] [0]
-		actual value:			[-32]
+		actual value:			[-8192]
 		expected value:			[0]
 
-Completed &quot;words_tests&quot;: 1 pass, 1 failure in 42ms.
+  &quot;words_tests&quot;: 1 pass, 1 failure in 42ms.
 Completed &quot;main&quot;: 1 pass, 1 failure in 42ms.</pre>
 </div>
 </div>
@@ -1148,7 +1149,7 @@ words_tests.c:13: Failure: words_tests -&gt; returns_word_count
 		actual value:			[2]
 		expected value:			[4]
 
-Completed &quot;words_tests&quot;: 1 pass, 1 failure in 42ms.
+  &quot;words_tests&quot;: 1 pass, 1 failure in 42ms.
 Completed &quot;main&quot;: 1 pass, 1 failure in 42ms.</pre>
 </div>
 </div>
@@ -1173,7 +1174,7 @@ call in our loop.  Moving the length calculation out of the loop…​</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;main&quot; (2 tests)...
-Completed &quot;words_tests&quot;: 2 passes in 42ms.
+  &quot;words_tests&quot;: 2 passes in 42ms.
 Completed &quot;main&quot;: 2 passes in 42ms.</pre>
 </div>
 </div>
@@ -1293,7 +1294,7 @@ void words(const char *sentence, void (*callback)(const char *, void *), void *m
 words_tests.c:33: Failure: words_tests -&gt; invokes_callback_once_for_single_word_sentence
 	Expected call was not made to mocked function [mocked_callback]
 
-Completed &quot;words_tests&quot;: 2 passes, 1 failure in 42ms.
+  &quot;words_tests&quot;: 2 passes, 1 failure in 42ms.
 Completed &quot;main&quot;: 2 passes, 1 failure in 42ms.</pre>
 </div>
 </div>
@@ -1316,7 +1317,7 @@ although it doesn’t drive much functionality yet.</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;main&quot; (3 tests)...
-Completed &quot;words_tests&quot;: 4 passes in 42ms.
+  &quot;words_tests&quot;: 4 passes in 42ms.
 Completed &quot;main&quot;: 4 passes in 42ms.</pre>
 </div>
 </div>
@@ -1358,7 +1359,7 @@ words_tests.c:40: Failure: words_tests -&gt; invokes_callback_for_each_word_in_a
 words_tests.c:41: Failure: words_tests -&gt; invokes_callback_for_each_word_in_a_phrase
 	Expected call was not made to mocked function [mocked_callback]
 
-Completed &quot;words_tests&quot;: 4 passes, 4 failures in 42ms.
+  &quot;words_tests&quot;: 4 passes, 4 failures in 42ms.
 Completed &quot;main&quot;: 4 passes, 4 failures in 42ms.</pre>
 </div>
 </div>
@@ -1392,7 +1393,7 @@ earlier…​</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;main&quot; (4 tests)...
-Completed &quot;words_tests&quot;: 8 passes in 42ms.
+  &quot;words_tests&quot;: 8 passes in 42ms.
 Completed &quot;main&quot;: 8 passes in 42ms.</pre>
 </div>
 </div>

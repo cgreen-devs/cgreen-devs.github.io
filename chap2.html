@@ -682,7 +682,7 @@ when called.</td>
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;stream&quot; (1 tests)...
-Completed &quot;ParagraphReader&quot;: 1 pass in 42ms.
+  &quot;ParagraphReader&quot;: 1 pass in 42ms.
 Completed &quot;stream&quot;: 1 pass in 42ms.</pre>
 </div>
 </div>
@@ -723,11 +723,11 @@ that will be given back once the test proper starts.</p>
 <div class="content">
 <pre>Running &quot;stream&quot; (2 tests)...
 stream_tests.c:23: Failure: ParagraphReader -&gt; gives_one_character_line_for_one_character_stream
-	Expected [line] to [equal string] [&quot;a&quot;]
-		actual value:			[&quot;¡&quot;]
-		expected to equal:		[&quot;a&quot;]
+    Expected [line] to [equal string] [&quot;a&quot;]
+        actual value:			[&quot;¡0@ð&quot;]
+        expected to equal:		[&quot;a&quot;]
 
-Completed &quot;ParagraphReader&quot;: 1 pass, 1 failure in 42ms.
+  &quot;ParagraphReader&quot;: 1 pass, 1 failure in 42ms.
 Completed &quot;stream&quot;: 1 pass, 1 failure in 42ms.</pre>
 </div>
 </div>
@@ -772,7 +772,7 @@ Completed &quot;stream&quot;: 1 pass, 1 failure in 42ms.</pre>
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;stream&quot; (2 tests)...
-Completed &quot;ParagraphReader&quot;: 2 passes in 42ms.
+  &quot;ParagraphReader&quot;: 2 passes in 42ms.
 Completed &quot;stream&quot;: 2 passes in 42ms.</pre>
 </div>
 </div>
@@ -867,7 +867,7 @@ stream_tests.c:45: Failure: ParagraphReader -&gt; gives_empty_line_for_single_li
 &quot;]
 		expected to equal:		[&quot;&quot;]
 
-Completed &quot;ParagraphReader&quot;: 3 passes, 2 failures in 42ms.
+  &quot;ParagraphReader&quot;: 3 passes, 2 failures in 42ms.
 Completed &quot;stream&quot;: 3 passes, 2 failures in 42ms.</pre>
 </div>
 </div>
@@ -902,7 +902,7 @@ Another fix later…​</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;stream&quot; (5 tests)...
-Completed &quot;ParagraphReader&quot;: 5 passes in 42ms.
+  &quot;ParagraphReader&quot;: 5 passes in 42ms.
 Completed &quot;stream&quot;: 5 passes in 42ms.</pre>
 </div>
 </div>
@@ -1278,7 +1278,7 @@ expectation, one for each reference parameter, but naturally only one
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;formatter&quot; (1 tests)...
-Completed &quot;Formatter&quot;: 1 pass in 42ms.
+  &quot;Formatter&quot;: 1 pass in 42ms.
 Completed &quot;formatter&quot;: 1 pass in 42ms.</pre>
 </div>
 </div>
@@ -1307,7 +1307,7 @@ loop.</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;formatter&quot; (2 tests)...
-Completed &quot;Formatter&quot;: 2 passes in 42ms.
+  &quot;Formatter&quot;: 2 passes in 42ms.
 Completed &quot;formatter&quot;: 2 passes in 42ms.</pre>
 </div>
 </div>
@@ -1338,7 +1338,7 @@ we get <code>&quot;a&quot;</code>, <code>&quot;b&quot;</code> and <code>&quot;c&
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;formatter&quot; (3 tests)...
-Completed &quot;Formatter&quot;: 5 passes in 42ms.
+  &quot;Formatter&quot;: 5 passes in 42ms.
 Completed &quot;formatter&quot;: 5 passes in 42ms.</pre>
 </div>
 </div>
@@ -1365,7 +1365,7 @@ correct functions.  This is a more realistic parameter check…​</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;formatter&quot; (4 tests)...
-Completed &quot;Formatter&quot;: 9 passes in 42ms.
+  &quot;Formatter&quot;: 9 passes in 42ms.
 Completed &quot;formatter&quot;: 9 passes in 42ms.</pre>
 </div>
 </div>
@@ -1392,7 +1392,7 @@ there is no paragraph.</p>
 formatter_tests.c:59: Failure: Formatter -&gt; ignores_empty_paragraphs
 	Mocked function [writer] has an expectation that it will never be called, but it was
 
-Completed &quot;Formatter&quot;: 9 passes, 1 failure in 42ms.
+  &quot;Formatter&quot;: 9 passes, 1 failure in 42ms.
 Completed &quot;formatter&quot;: 9 passes, 1 failure in 42ms.</pre>
 </div>
 </div>
@@ -1421,7 +1421,7 @@ bugs.</p>
 <div class="listingblock">
 <div class="content">
 <pre>Running &quot;formatter&quot; (5 tests)...
-Completed &quot;Formatter&quot;: 9 passes in 42ms.
+  &quot;Formatter&quot;: 9 passes in 42ms.
 Completed &quot;formatter&quot;: 9 passes in 42ms.</pre>
 </div>
 </div>

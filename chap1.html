@@ -1153,6 +1153,7 @@ int main(int argc, char **argv) {
 $ gcc strlen_test.o -lcgreen -o strlen_test
 $ ./strlen_test
 Running &quot;our_tests&quot; (1 tests)...
+  &quot;our_tests&quot;: 1 pass in 42ms.
 Completed &quot;our_tests&quot;: 1 pass in 42ms.</pre>
 </div>
 </div>
@@ -1179,6 +1180,7 @@ strlen_tests.c:9: Failure: returns_five_for_hello
 		actual value:			[4]
 		expected value:			[5]
 
+  &quot;our_tests&quot;: 1 failure in 42ms.
 Completed &quot;our_tests&quot;: 1 failure in 42ms.</pre>
 </div>
 </div>
@@ -1445,6 +1447,7 @@ int main(int argc, char **argv) {
 crash_tests.c:8: Exception: seg_faults_for_null_dereference
 	Test terminated with signal: Segmentation fault
 
+  &quot;main&quot;: 1 exception in 42ms.
 Completed &quot;main&quot;: 1 exception in 42ms.</pre>
 </div>
 </div>
@@ -1583,6 +1586,7 @@ crash_tests.c:8: Exception: seg_faults_for_null_dereference
 crash_tests.c:13: Exception: will_loop_forever
 	Test terminated unexpectedly, likely from a non-standard exception or Posix signal
 
+  &quot;main&quot;: 2 exceptions in 42ms.
 Completed &quot;main&quot;: 2 exceptions in 42ms.</pre>
 </div>
 </div>

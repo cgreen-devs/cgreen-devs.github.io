@@ -1011,7 +1011,7 @@ working. So far it is.</p>
 test_as_xml.c:12: Failure: A Group -&gt; reports_a_test_that_fails
 	A failure
 
-Completed &quot;A Group&quot;: 1 pass, 1 failure in 42ms.
+  &quot;A Group&quot;: 1 pass, 1 failure in 42ms.
 Completed &quot;Top Level&quot;: 1 pass, 1 failure in 42ms.</pre>
 </div>
 </div>
@@ -1099,13 +1099,13 @@ static void xml_reporter_start_test(TestReporter *reporter, const char *name) {
     reporter_start_test(reporter, name);
 }
 
-static void xml_reporter_finish_test(TestReporter *reporter, const char *filename, int line, const char *message, uint32_t duration_in_milliseconds) {
-    reporter_finish_test(reporter, filename, line, message, duration_in_milliseconds);
+static void xml_reporter_finish_test(TestReporter *reporter, const char *filename, int line, const char *message) {
+    reporter_finish_test(reporter, filename, line, message);
     printf(&quot;&lt;/test&gt;\n&quot;);
 }
 
-static void xml_reporter_finish_suite(TestReporter *reporter, const char *filename, int line, uint32_t duration_in_milliseconds) {
-    reporter_finish_suite(reporter, filename, line, duration_in_milliseconds);
+static void xml_reporter_finish_suite(TestReporter *reporter, const char *filename, int line) {
+    reporter_finish_suite(reporter, filename, line);
     printf(&quot;&lt;/suite&gt;\n&quot;);
 }
 
@@ -1300,14 +1300,14 @@ static void xml_show_incomplete(TestReporter *reporter, const char *file, int li
 }
 
 
-static void xml_reporter_finish_test(TestReporter *reporter, const char *filename, int line, const char *message, uint32_t duration_in_milliseconds) {
-    reporter_finish_test(reporter, filename, line, message, duration_in_milliseconds);
+static void xml_reporter_finish_test(TestReporter *reporter, const char *filename, int line, const char *message) {
+    reporter_finish_test(reporter, filename, line, message);
     indent(reporter);
     printf(&quot;&lt;/test&gt;\n&quot;);
 }
 
-static void xml_reporter_finish_suite(TestReporter *reporter, const char *filename, int line, uint32_t duration_in_milliseconds) {
-    reporter_finish_suite(reporter, filename, line, duration_in_milliseconds);
+static void xml_reporter_finish_suite(TestReporter *reporter, const char *filename, int line) {
+    reporter_finish_suite(reporter, filename, line);
     indent(reporter);
     printf(&quot;&lt;/suite&gt;\n&quot;);
 }
