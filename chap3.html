@@ -429,7 +429,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="email2" class="email"><a href="mailto:thomas@junovagen.se">thomas@junovagen.se</a></span><br>
 <span id="author3" class="author">João Freitas</span><br>
 <span id="email3" class="email"><a href="mailto:joaohf@gmail.com">joaohf@gmail.com</a></span><br>
-<span id="revnumber">version {VERSION}</span>
+<span id="revnumber">version 1.1.0beta</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -523,14 +523,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 here, but about values of C/C++ <code>double</code> type (a.k.a double float.)</p>
 </div>
 <div class="paragraph">
-<p><strong>Cgreen</strong> is designed to make it easy and natural to write assertions and
-expectations. Many functions can be used for multiple data types, e.g.
-<code>is_equal_to()</code> applies to all integer type values.</p>
+<p><strong>Cgreen</strong> is designed to make it easy and natural to write assertions
+and expectations. Many functions can be used for multiple data types,
+e.g.  <code>is_equal_to()</code> applies to all integer type values, actually
+including pointers.</p>
 </div>
 <div class="paragraph">
 <p>But the C language has its quirks. One of them is the fact that it is
-impossible to inspect the datatypes of values during run-time. This has e.g.
-forced the introduction of <code>is_equal_to_string()</code> to enable string comparisons.</p>
+impossible to inspect the datatypes of values during run-time. This
+has e.g.  forced the introduction of <code>is_equal_to_string()</code> to enable
+string comparisons.</p>
 </div>
 <div class="sect3">
 <h4 id="_assertions_and_constraints">4.1.1. Assertions and Constraints</h4>
@@ -632,29 +634,38 @@ together.
 <div class="sect3">
 <h4 id="double_mocks">4.1.2. Mocks</h4>
 <div class="paragraph">
-<p>When you are using mocks with double typed values there are two different
-issues to remember:</p>
+<p>The general mechanism <strong>Cgreen</strong> uses to transport values to and from
+mock functions is based on the simple idea that most types fit into a
+&quot;large&quot; integer and can be type converted to and from whatever type
+you need.</p>
+</div>
+<div class="paragraph">
+<p>Since a <code>double float</code> will not fit into the same memory space as an
+integer <strong>Cgreen</strong> handles that by encapsulating (&quot;boxing&quot;) the <code>double</code>
+into an area which is represented by the pointer to it.  And that
+pointer can fit into the integer type value (<code>intptr_t</code>) that <strong>Cgreen</strong>
+uses to transport values into and out of <code>mock()</code>.  To get the value
+back you &quot;unbox&quot; it.</p>
+</div>
+<div class="paragraph">
+<p>There are two possible uses of <code>double</code> that you need to be
+aware of</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>To use <code>double</code> as arguments to <code>mock()</code> you must &quot;box&quot; them</p>
+<p>When a parameter to the mocked function is of <code>double</code> type and
+needs to be matched in an constraint in an <code>expect</code> call.</p>
 </li>
 <li>
-<p>A <code>double</code> return value from <code>mock()</code> needs to be &quot;unboxed&quot;</p>
+<p>When the mock function itself should return a <code>double</code> type value.</p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
-<p>So, what is this &quot;boxing&quot; and &quot;unboxing&quot; then?</p>
-</div>
-<div class="paragraph">
-<p>Since a <code>double float</code> will not fit into the same memory space as
-an integer <strong>Cgreen</strong> handles that by encapsulating (&quot;boxing&quot;) the
-<code>double</code> into an area which is represented by the pointer to it.
-And that pointer can fit into the integer type value that <strong>Cgreen</strong>
-uses to transport values into and out of <code>mock()</code>.
-To get the value back you &quot;unbox&quot; it.</p>
+<p>In the test you should use the special <code>double</code> type constraints and
+the <code>will_return_double()</code> convenience function.  In the mock function
+you will have to take care to box and unbox as required.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
@@ -663,7 +674,7 @@ To get the value back you &quot;unbox&quot; it.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Boxing</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Boxing and unboxing in mock functions</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Description</strong></p></td>
 </tr>
 <tr>
@@ -685,17 +696,51 @@ To get the value back you &quot;unbox&quot; it.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c" data-lang="c">static double double_out(int i, double d) {
-    return unbox_double(mock(i, box_double(d)));
+    return unbox_double(mock(i, box_double(d))); <i class="conum" data-value="1"></i><b>(1)</b>
 }
 
 Ensure(Doubles, can_be_arguments_to_mock_and_returned) {
     expect(double_out,
            when(i, is_equal_to(15)),
-           when(d, is_equal_to_double(31.32)),
-           will_return_double(3.1415926));
+           when(d, is_equal_to_double(31.32)), <i class="conum" data-value="2"></i><b>(2)</b>
+           will_return_double(3.1415926));     <i class="conum" data-value="3"></i><b>(3)</b>
     assert_that_double(double_out(15, 31.32), is_equal_to_double(3.1415926));
 }</code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>We can see that the parameter <code>d</code> to the mock function, since it is a
+<code>double</code>, it will have to be used as <code>box_double(d)</code> in the call to
+<code>mock()</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The corresponding <code>expect()</code> uses a double constraint.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The mock function in this small example also returns a <code>double</code>. The
+<code>expect()</code> uses <code>will_return_double()</code> so the mock function needs to
+unbox the return value from <code>mock()</code> to be able to return the <code>double</code>
+type value.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Strange errors may occur if you box and/or unbox or combine
+<code>double</code> constraints incorrectly.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect3">
@@ -709,17 +754,19 @@ smaller than 10^(1 - significant_figures)^. Mathematically, we check
 that |x - y| &lt; max(|x|, |y|) * 10^(1 - significant_figures)^.</p>
 </div>
 <div class="paragraph">
-<p>Well documented subtleties arise when comparing floating point numbers close to
-zero using this algorithm. The article
-<a href="https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/">Comparing Floating Point Numbers, 2012 Edition</a>
-by Bruce Dawson has an excellent discussion of the issue. The essence of the
-problem can be appreciated if we consider the special case where y == 0. In
-that case, our condition reduces to |x| &lt; |x| * 10^(1 - significant_figures)^.
-After cancelling |x| this simplifies to 1 &lt; 10^(1 - significant_figures)^.
-But this is only true if significant_figures &lt; 1. In words this can be
-summarized by saying that, in a relative sense, <em>all</em> numbers are very different
-from zero. To circumvent this difficulty we recommend to use a constraint of the
-following form when comparing numbers close to zero:</p>
+<p>Well documented subtleties arise when comparing floating point numbers
+close to zero using this algorithm. The article
+<a href="https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/">Comparing
+Floating Point Numbers, 2012 Edition</a> by Bruce Dawson has an excellent
+discussion of the issue. The essence of the problem can be appreciated
+if we consider the special case where y == 0. In that case, our
+condition reduces to |x| &lt; |x| * 10^(1 - significant_figures)^.
+After cancelling |x| this simplifies to 1 &lt; 10^(1 -
+significant_figures)^.  But this is only true if significant_figures
+&lt; 1. In words this can be summarized by saying that, in a relative
+sense, <em>all</em> numbers are very different from zero. To circumvent this
+difficulty we recommend to use a constraint of the following form when
+comparing numbers close to zero:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -762,13 +809,27 @@ at the beginning of the file with your tests</p>
 <p>There is also one extra feature when you use C++, the <code>assert_throws</code>
 function.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you use the runner, as described in <a href="chap5.html#runner">Automatic Test Discovery</a>, and thus link
+your tests into a shared library, don’t forget to link it with the
+same C++ library that was used to create the <code>cgreen-runner</code>.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div></div>
 <div id="footer">
 <div id="footer-text">
-Version {VERSION}<br>
-Last updated 2018-05-07 08:06:28 CEST
+Version 1.1.0beta<br>
+Last updated 2018-05-08 20:18:55 CEST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">

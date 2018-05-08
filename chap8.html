@@ -429,7 +429,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="email2" class="email"><a href="mailto:thomas@junovagen.se">thomas@junovagen.se</a></span><br>
 <span id="author3" class="author">João Freitas</span><br>
 <span id="email3" class="email"><a href="mailto:joaohf@gmail.com">joaohf@gmail.com</a></span><br>
-<span id="revnumber">version {VERSION}</span>
+<span id="revnumber">version 1.1.0beta</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -555,28 +555,31 @@ is replaced with a call to <code>mock()</code>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>So give a header file containg lines like</p>
+<p>So given a header file containing lines like</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">extern CgreenValue make_cgreen_integer_value(intptr_t integer);
-extern CgreenValue make_cgreen_string_value(const char *string);</code></pre>
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">extern Value make_integer_value(int integer);
+extern Value make_string_value(const char *string);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p><code>cgreen-mocker</code> will, give that there are no errors, print something
+<p><code>cgreen-mocker</code> will, given that there are no errors, print something
 like this on the screen:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">CgreenValue make_cgreen_integer_value(intptr_t integer) {
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Value make_integer_value(int integer) {
   return mock(integer);
 }
 
-CgreenValue make_cgreen_string_value(const char *string) {
+Value make_string_value(const char *string) {
   return mock(string);
 }</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Of course, you would pipe this output to a file.</p>
 </div>
 <div class="paragraph">
 <p>To use <code>cgreen-mocker</code> you need Python and <code>pycparser</code>. The latter
@@ -783,8 +786,8 @@ output consistency. You can’t have both…​</p>
 </div></div>
 <div id="footer">
 <div id="footer-text">
-Version {VERSION}<br>
-Last updated 2018-05-07 08:06:28 CEST
+Version 1.1.0beta<br>
+Last updated 2018-05-08 20:18:55 CEST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">

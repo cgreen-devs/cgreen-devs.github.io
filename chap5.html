@@ -429,7 +429,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="email2" class="email"><a href="mailto:thomas@junovagen.se">thomas@junovagen.se</a></span><br>
 <span id="author3" class="author">João Freitas</span><br>
 <span id="email3" class="email"><a href="mailto:joaohf@gmail.com">joaohf@gmail.com</a></span><br>
-<span id="revnumber">version {VERSION}</span>
+<span id="revnumber">version 1.1.0beta</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -761,17 +761,17 @@ all tests and runs them one by one. The macros required by the BDD-ish
 style ensures that the corresponding <code>BeforeEach()</code> and <code>AfterEach()</code>
 are run before and after each test.</p>
 </div>
-<div class="admonitionblock note">
+<div class="admonitionblock caution">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-note" title="Note"></i>
+<i class="fa icon-caution" title="Caution"></i>
 </td>
 <td class="content">
 The <code>cgreen-runner</code> <em>will</em> discover your tests in a shared
 library even if you don’t use the BDD-ish style. But it will not be
 able to find and run the <code>setup()</code> and/or <code>teardown()</code> attached to your
-suite(s).
+suite(s). This will probably cause your tests to fail or crash.
 </td>
 </tr>
 </table>
@@ -785,7 +785,7 @@ frustrating trouble-shooting when you added <code>setup()</code>
 and <code>teardown()</code> and can’t understand why they are not run…​</p>
 </div>
 <div class="paragraph">
-<p>So, the runner incourages you to use the BDD notation. But since we
+<p>So, the runner encourages you to use the BDD notation. But since we
 recommend that you do anyway, that’s no extra problem if you are
 starting out from scratch. But see <a href="chap6.html#changing_style">Changing Style</a> for some easy
 tips on how to get you there if you already have non-BDD
@@ -838,8 +838,8 @@ it is clearly visible that you have some skipped test when you run them.</p>
 </div></div>
 <div id="footer">
 <div id="footer-text">
-Version {VERSION}<br>
-Last updated 2018-05-07 08:06:28 CEST
+Version 1.1.0beta<br>
+Last updated 2018-05-08 20:18:55 CEST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
