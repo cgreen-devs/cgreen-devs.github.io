@@ -5,7 +5,7 @@
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.4">
-<meta name="author" content="Marcus Baker, Thomas Nilefalk, João Freitas">
+<meta name="author" content="v1.2.0beta">
 <title>Cgreen : Unit Tests, Stubbing and Mocking for C and C++</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -423,13 +423,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="header">
 <h1>Cgreen : Unit Tests, Stubbing and Mocking for C and C++</h1>
 <div class="details">
-<span id="author" class="author">Marcus Baker</span><br>
-<span id="email" class="email"><a href="mailto:marcus@lastcraft.com">marcus@lastcraft.com</a></span><br>
-<span id="author2" class="author">Thomas Nilefalk</span><br>
-<span id="email2" class="email"><a href="mailto:thomas@junovagen.se">thomas@junovagen.se</a></span><br>
-<span id="author3" class="author">João Freitas</span><br>
-<span id="email3" class="email"><a href="mailto:joaohf@gmail.com">joaohf@gmail.com</a></span><br>
-<span id="revnumber">version 1.1.0beta</span>
+<span id="author" class="author">v1.2.0beta</span><br>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -453,7 +447,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_a_runner">2.6. A Runner</a></li>
 <li><a href="#_beforeeach_and_aftereach">2.7. BeforeEach and AfterEach</a></li>
 <li><a href="#_each_test_in_its_own_process">2.8. Each Test in its Own Process</a></li>
-<li><a href="#no-fork">2.9. No fork, please</a></li>
+<li><a href="#debugging">2.9. Debugging <strong>Cgreen</strong> tests</a></li>
 <li><a href="#_building_composite_test_suites">2.10. Building Composite Test Suites</a></li>
 </ul>
 </li>
@@ -477,7 +471,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="chap4.html#_contexts_and_before_and_after">5.2. Contexts and Before and After</a></li>
 </ul>
 </li>
-<li><a href="chap5.html#runner">6. Automatic Test Discovery</a>
+<li><a href="chap5.html#auto-discovery">6. Automatic Test Discovery</a>
 <ul class="sectlevel2">
 <li><a href="chap5.html#_forgot_to_add_your_test">6.1. Forgot to Add Your Test?</a></li>
 <li><a href="chap5.html#_the_solution_the_cgreen_runner">6.2. The Solution - the 'cgreen-runner'</a></li>
@@ -509,6 +503,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </ul>
 </li>
 <li><a href="chap9.html#_license">Appendix A: License</a></li>
+<li><a href="chap10.html#_acknowledgements">Appendix B: Acknowledgements</a></li>
 </ul>
 </div>
 </div>
@@ -1077,7 +1072,7 @@ constraints based assertions.
 <h3 id="_a_runner">2.6. A Runner</h3>
 <div class="paragraph">
 <p>The tests are only run by running a test suite in some form. (But see
-also <a href="chap5.html#runner">Automatic Test Discovery</a>.) We can create and run one especially for this test like
+also <a href="#runner">[runner]</a>.) We can create and run one especially for this test like
 so…​</p>
 </div>
 <div class="listingblock">
@@ -1488,19 +1483,8 @@ crashing test…​</p>
 </div>
 </div>
 <div class="paragraph">
-<p>When run in this way, <strong>Cgreen</strong> will not <code>fork()</code>. But see also <a href="#no-fork">No fork, please</a>.</p>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-The function <code>run()</code> is a good place to place a breakpoint.
-</td>
-</tr>
-</table>
+<p>When run in this way, <strong>Cgreen</strong> will not <code>fork()</code>. But see the section
+on <a href="#debugging">Debugging <strong>Cgreen</strong> tests</a>.</p>
 </div>
 <div class="paragraph">
 <p>The following is a typical session:</p>
@@ -1609,7 +1593,7 @@ run.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="no-fork">2.9. No fork, please</h3>
+<h3 id="debugging">2.9. Debugging <strong>Cgreen</strong> tests</h3>
 <div class="paragraph">
 <p><strong>Cgreen</strong> protects itself from being torn down by an exception in a
 test by <code>fork()</code>-ing each test into a separate process. A catastrophic
@@ -1617,6 +1601,8 @@ error will then only affect the child process for that specific test
 and <strong>Cgreen</strong> can catch it, rather than crashing too. It can then
 report the exception and continue with the next test.</p>
 </div>
+<div class="sect3">
+<h4 id="_no_fork_please">2.9.1. No fork, please</h4>
 <div class="paragraph">
 <p>If you want to debug any of your tests the constant <code>fork()</code>-ing
 might make that difficult or impossible. There are also other
@@ -1653,6 +1639,68 @@ use.
 </td>
 </tr>
 </table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_debugging_with_code_cgreen_runner_code">2.9.2. Debugging with <code>cgreen-runner</code></h4>
+<div class="paragraph">
+<p>If you use the convenient auto-discovery feature of <strong>Cgreen</strong> (see
+<a href="chap5.html#auto-discovery">Automatic Test Discovery</a>) by running dynamic loadable libraries through
+<code>cgreen-runner</code>, it might be tricky to figure out to where to put
+breaks and to get them to &quot;take&quot;.</p>
+</div>
+<div class="paragraph">
+<p><code>cgreen-runner</code> obviously loads the library (or libraries) with your
+tests dynamically so the tests are not available before executing the
+code that loads them.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The function <code>run()</code> is a good place to place a breakpoint.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="__code_cgreen_debug_code">2.9.3. <code>cgreen-debug</code></h4>
+<div class="paragraph">
+<p>For some platforms a utility script, <code>cgreen-debug</code>, is installed when
+you install <strong>Cgreen</strong>. It makes it very convenient to start a debugging
+session for a particular test.</p>
+</div>
+<div class="paragraph">
+<p>Find out the logical name of the test, which is composed of the
+Context and the Testname, in the form &lt;context&gt;:&lt;testname&gt;. Then just
+invoke <code>cgreen-debug</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ cgreen-debug &lt;library&gt; &lt;context&gt;:&lt;testname&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The script will try to find a debugger, invoke it on the
+<code>cgreen-runner</code> and break on that test.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Currently it only supports <code>gdb</code> and will prefer <code>cgdb</code> if
+that’s available.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -1888,8 +1936,7 @@ TestSuite *connection_fixture(TestSuite *suite) {
 </div></div>
 <div id="footer">
 <div id="footer-text">
-Version 1.1.0beta<br>
-Last updated 2018-05-08 20:18:55 CEST
+Last updated 2018-05-10 14:31:17 CEST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
