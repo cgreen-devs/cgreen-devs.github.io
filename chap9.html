@@ -5,7 +5,7 @@
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.5">
-<meta name="author" content="v{VERSION}">
+<meta name="author" content="v1.2.0beta">
 <title>Cgreen : Unit Tests, Stubbing and Mocking for C and C++</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -424,7 +424,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="header">
 <h1>Cgreen : Unit Tests, Stubbing and Mocking for C and C++</h1>
 <div class="details">
-<span id="author" class="author">v{VERSION}</span><br>
+<span id="author" class="author">v1.2.0beta</span><br>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -494,48 +494,300 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="chap7.html#_an_example_xml_reporter">8.5. An Example XML Reporter</a></li>
 </ul>
 </li>
-<li><a href="chap8.html#_hints_and_tips">9. Hints and Tips</a>
+<li><a href="chap8.html#_advanced_usage">9. Advanced Usage</a>
 <ul class="sectlevel2">
-<li><a href="chap8.html#cgreen-mocker">9.1. <code>cgreen-mocker</code> - Automated Mocking</a></li>
-<li><a href="chap8.html#_compiler_error_messages">9.2. Compiler Error Messages</a></li>
-<li><a href="chap8.html#_signed_unsigned_hex_and_byte">9.3. Signed, Unsigned, Hex and Byte</a></li>
-<li><a href="chap8.html#_cgreen_and_coverage">9.4. Cgreen and Coverage</a></li>
-<li><a href="chap8.html#_garbled_output">9.5. Garbled Output</a></li>
+<li><a href="chap8.html#_custom_constraints">9.1. Custom Constraints</a></li>
 </ul>
 </li>
-<li><a href="#_license">Appendix A: License</a></li>
-<li><a href="chap10.html#_acknowledgements">Appendix B: Acknowledgements</a></li>
+<li><a href="#_hints_and_tips">10. Hints and Tips</a>
+<ul class="sectlevel2">
+<li><a href="#cgreen-mocker">10.1. <code>cgreen-mocker</code> - Automated Mocking</a></li>
+<li><a href="#_compiler_error_messages">10.2. Compiler Error Messages</a></li>
+<li><a href="#_signed_unsigned_hex_and_byte">10.3. Signed, Unsigned, Hex and Byte</a></li>
+<li><a href="#_cgreen_and_coverage">10.4. Cgreen and Coverage</a></li>
+<li><a href="#_garbled_output">10.5. Garbled Output</a></li>
+</ul>
+</li>
+<li><a href="chap10.html#_license">Appendix A: License</a></li>
+<li><a href="chap11.html#_acknowledgements">Appendix B: Acknowledgements</a></li>
 </ul>
 </div>
 </div>
 <div id="content"><div class="sect1">
-<h2 id="_license">Appendix A: License</h2>
+<h2 id="_hints_and_tips">10. Hints and Tips</h2>
 <div class="sectionbody">
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+This chapter is intended to contain tips for situations that
+you might need some help with, but it is nowhere near complete at this
+time.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="cgreen-mocker">10.1. <code>cgreen-mocker</code> - Automated Mocking</h3>
 <div class="paragraph">
-<p>Copyright (c) 2006-2018, Cgreen Development Team and contributors<br>
-(<a href="https://github.com/cgreen-devs/cgreen/graphs/contributors" class="bare">https://github.com/cgreen-devs/cgreen/graphs/contributors</a>)</p>
+<p>Are you starting out with <strong>Cgreen</strong> on a largish legacy system? And there
+are loads and loads of functions to mock to get a unit under test?</p>
 </div>
 <div class="paragraph">
-<p>Permission to use, copy, modify, and/or distribute this software and
-its documentation for any purpose with or without fee is hereby
-granted, provided that the above copyright notice and this permission
-notice appear in all copies, regardless of form, including printed and
-compiled.</p>
+<p>You could try the <code>cgreen-mocker</code> that is supplied as a contributed
+part of the <strong>Cgreen</strong> source distribution.</p>
 </div>
 <div class="paragraph">
-<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</p>
+<p>It is a Python program that parses C language header files and tries
+to create a corresponding <code>.mock</code> file where each function declaration
+is replaced with a call to <code>mock()</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Usage:
+  cgreen-mocker.py &lt;headerfile&gt; { &lt;cpp_directive&gt; }
+     &lt;headerfile&gt;: file with function declarations that you want
+                   to mock
+     &lt;cpp_directive&gt;: any 'cpp' directive but most useful is e.g.
+                      &quot;-I &lt;directory&gt;&quot; to ensure cpp finds files.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So given a header file containing lines like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">extern Value make_integer_value(int integer);
+extern Value make_string_value(const char *string);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>cgreen-mocker</code> will, given that there are no errors, print something
+like this on the screen:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Value make_integer_value(int integer) {
+  return mock(integer);
+}
+
+Value make_string_value(const char *string) {
+  return mock(string);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Of course, you would pipe this output to a file.</p>
+</div>
+<div class="paragraph">
+<p>To use <code>cgreen-mocker</code> you need Python and <code>pycparser</code>. The latter
+can be found at [<a href="https://github.com/eliben/pycparser" class="bare">https://github.com/eliben/pycparser</a>] or can easily
+be installed with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ pip install pycparser</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>cgreen-mocker</code> is an unsupported contribution to the <strong>Cgreen</strong>
+project by Thomas Nilefalk.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_compiler_error_messages">10.2. Compiler Error Messages</h3>
+<div class="paragraph">
+<p>Sometimes you might get cryptic and strange error messages from the
+compiler. Since <strong>Cgreen</strong> uses some C/C++ macro magic this can happen
+and the error messages might not be straight forward to interpret.</p>
+</div>
+<div class="paragraph">
+<p>Here are some examples, but the exact messages differ between compilers
+and versions.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Compiler error message</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Probable cause…​</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>&quot;contextFor&lt;X&gt;&quot; is undeclared here</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Missing <code>Describe(&lt;X&gt;);</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>undefined reference to 'AfterEach_For_&lt;X&gt;'</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Missing <code>AfterEach(&lt;X&gt;)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CgreenSpec<em>&lt;X&gt;</em>&lt;Y&gt;__ is undeclared</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Missing test subject/context in the <code>Ensure</code> of a BDD style test</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>use of undeclared identifier 'contextFor&lt;X&gt;'</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Missing <code>Describe(&lt;X&gt;);</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_signed_unsigned_hex_and_byte">10.3. Signed, Unsigned, Hex and Byte</h3>
+<div class="paragraph">
+<p><strong>Cgreen</strong> attempts to handle primitive type comparisons with a single
+constraint, <code>is_equal_to()</code>. This means that it must store the actual
+and expected values in a form that will accomodate all possible values
+that primitive types might take, typically an <code>intptr_t</code>.</p>
+</div>
+<div class="paragraph">
+<p>This might sometimes cause unexpected comparisons since all actual
+values will be cast to match <code>intptr_t</code>, which is a signed value. E.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(Char, can_compare_byte) {
+  char chars[4] = {0xaa, 0xaa, 0xaa, 0};
+  assert_that(chars[0], is_equal_to(0xaa));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On a system which considers <code>char</code> to be signed this will cause the
+following <strong>Cgreen</strong> assertion error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>char_tests.c:11: Failure: Char -&gt; can_compare_byte
+        Expected [chars[0]] to [equal] [0xaa]
+                actual value:                   [-86]
+                expected value:                 [170]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is caused by the C rules forcing an implicit cast of the <code>signed
+char</code> to <code>intptr_t</code> by sign-extension. This might not be what you
+expected. The correct solution, by any standard, is to cast the actual
+value to <code>unsigned char</code> which will then be interpreted correctly. And
+the test passes.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Casting to <code>unsigned</code> will not always suffice since that is
+interpreted as <code>unsigned int</code> which will cause a sign-extension from
+the <code>signed char</code> and might or might not work depending on the size of
+<code>int</code> on your machine.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In order to reveal what really happens you might want to see the actual and
+expected values in hex. This can easily be done with the
+<code>is_equal_to_hex()</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">Ensure(Char, can_compare_byte) {
+  char chars[4] = {0xaa, 0xaa, 0xaa, 0};
+  assert_that(chars[0], is_equal_to_hex(0xaa));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This might make the mistake easier to spot:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>char_tests.c:11: Failure: Char -&gt; can_compare_byte
+        Expected [chars[0]] to [equal] [0xaa]
+        actual value:                   [0xfffffffffffffaa]
+        expected value:                 [0xaa]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_cgreen_and_coverage">10.4. Cgreen and Coverage</h3>
+<div class="paragraph">
+<p><strong>Cgreen</strong> is compatible with coverage tools, in particular
+<code>gcov</code>/<code>lcov</code>. So generating coverage data for your application should
+be straight forward.</p>
+</div>
+<div class="paragraph">
+<p>This is what you need to do (using <code>gcc</code> or <code>clang</code>):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>compile with <code>-ftest-coverage</code> and <code>-fprofile-arcs</code></p>
+</li>
+<li>
+<p>run tests</p>
+</li>
+<li>
+<p><code>lcov --directory . --capture --output-file coverage.info</code></p>
+</li>
+<li>
+<p><code>genhtml -o coverage coverage.info</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Your coverage data will be available in <code>coverage/index.html</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_garbled_output">10.5. Garbled Output</h3>
+<div class="paragraph">
+<p>If the output from your <strong>Cgreen</strong> based tests appear garbled or
+duplicated, this can be caused by the way <strong>Cgreen</strong> terminates its
+test-running child process. In many unix-like environments the
+termination of a child process should be done with <code>_exit()</code>. However,
+this interfers severily with the ability to collect coverage data. As
+this is important for many of us, <strong>Cgreen</strong> instead terminates its
+child process with the much cruder <code>exit()</code> (note: no underscore).</p>
+</div>
+<div class="paragraph">
+<p>Under rare circumstances this might have the unwanted effect of output
+becoming garbled and/or duplicated.</p>
+</div>
+<div class="paragraph">
+<p>If this happens you can change that behaviour using an environment
+variable <code>CGREEN_CHILD_EXIT_WITH__EXIT</code> (note: two underscores). If
+set, <strong>Cgreen</strong> will terminate its test-running child process with the
+more POSIX-compliant <code>_exit()</code>. But as mentioned before, this is, at
+least at this point in time, incompatible with collecting coverage
+data.</p>
+</div>
+<div class="paragraph">
+<p>So, it’s coverage <em>or</em> POSIX-correct child exits and guaranteed
+output consistency. You can’t have both…​</p>
+</div>
 </div>
 </div>
 </div></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-12-01 12:47:00 CET
+Last updated 2018-12-05 00:32:52 CET
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
