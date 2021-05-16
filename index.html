@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<meta name="author" content="v1.3.0">
+<meta name="author" content="v{VERSION}">
 <title>Cgreen : Unit Tests, Stubbing and Mocking for C and C++</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -442,7 +442,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="header">
 <h1>Cgreen : Unit Tests, Stubbing and Mocking for C and C++</h1>
 <div class="details">
-<span id="author" class="author">v1.3.0</span><br>
+<span id="author" class="author">v{VERSION}</span><br>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -3638,8 +3638,8 @@ discussion of the algorithm used for comparing floating point numbers.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Ditto for double values (required because of C&#8217;s type coercion rules which would otherwise convert a double into an int)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>will_set_contents_of_parameter(parameter_name, pointer_to_value, size)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Writes 'size' bytes from the pointed out value into the referenced parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>will_set_contents_of_parameter(parameter_name, value, size)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Writes the value in the referenced parameter</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>with_side_effect(pointer_to_function, pointer_to_data)</code></p></td>
@@ -6273,7 +6273,7 @@ for their contributions.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-14 09:30:34 +0200
+Last updated 2019-07-28 09:26:23 +0200
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
